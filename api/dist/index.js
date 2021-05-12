@@ -12,8 +12,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const fastify_1 = require("fastify");
 const configuration_1 = require("./config/configuration");
+const trades_module_1 = require("./trades/trades.module");
+const fastify_decorators_1 = require("fastify-decorators");
 const PORT = configuration_1.default().port;
 const server = fastify_1.default({ logger: true });
+const modules = [
+    trades_module_1.TradesModule,
+];
+let controllers = [];
+for (const module of modules) {
+    controllers = controllers.concat(module.controllers);
+}
+server.register(fastify_decorators_1.bootstrap, {
+    controllers
+});
 const opts = {
     schema: {
         response: {

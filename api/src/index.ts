@@ -6,20 +6,25 @@ import Fastify, {
 } from 'fastify';
 import config from './config/configuration';
 import { TradesModule } from "./trades/trades.module";
-// import { PORT } from './config/constants';
+import { bootstrap } from 'fastify-decorators';
+// import { resolve } from 'path';
+import { Constructor } from "fastify-decorators/decorators/helpers/inject-dependencies";
+import { IAppModule } from "./common/interfaces/interfaces";
+
 const PORT = config().port;
 
-const modules = [
-  TradesModule
-]
+const server: FastifyInstance = Fastify({ logger: true });
 
-const server: FastifyInstance = Fastify({ logger: true })
+const modules: IAppModule[] = [
+  TradesModule,
+]
+let controllers: Constructor<unknown>[] = [];
 for (const module of modules) {
-  module.controllers.forEach((controller) => {
-    server.register(controller)
-  });
+  controllers = controllers.concat(module.controllers)
 }
-// fastify.register(require('./routes/v1/users'), { prefix: '/v1' })
+server.register(bootstrap, {
+  controllers
+});
 
 const opts: RouteShorthandOptions = {
   schema: {
