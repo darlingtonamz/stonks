@@ -11,17 +11,32 @@ import { bootstrap } from 'fastify-decorators';
 // import { resolve } from 'path';
 import { Constructor } from "fastify-decorators/decorators/helpers/inject-dependencies";
 import { IAppModule } from "./common/interfaces/interfaces";
+import { StocksModule } from "./stocks/trades.module";
 
 const { port: PORT } = config();
 
 // const test: FastifyServerOptions;
 const server: FastifyInstance = Fastify({ logger: true });
+// server.setValidatorCompiler(({ schema }) => {
+  
+//   console.log('Validator 212 ############', schema)
+//   return () => ({});
+//   // return ajv.compile(schema)
+// })
+// server.setErrorHandler(function (error, _, reply) {
+//   console.log('Validator X1 ############', error)
+//   if (error.validation) {
+//     console.log('Validator X2 ############', error)
+//      reply.status(422).send(new Error('validation failed'))
+//   }
+// })
 
-const modules: IAppModule[] = [
+export const appModules: IAppModule[] = [
   TradesModule,
+  StocksModule,
 ]
 let controllers: Constructor<unknown>[] = [];
-for (const module of modules) {
+for (const module of appModules) {
   controllers = controllers.concat(module.controllers)
 }
 server.register(bootstrap, {

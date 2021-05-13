@@ -25,4 +25,6 @@ export class TradeEntity extends InstanceEntity {
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   public timestamp: Date;
+
+  // TODO - Index user and symbol
 }

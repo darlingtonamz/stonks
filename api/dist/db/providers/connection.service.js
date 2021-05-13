@@ -18,67 +18,46 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TradesController = void 0;
+exports.ConnectionService = void 0;
 const fastify_decorators_1 = require("fastify-decorators");
-const trade_dto_1 = require("../dtos/trade.dto");
-const trades_service_1 = require("../providers/trades.service");
-let TradesController = class TradesController {
-    constructor(service) {
-        this.service = service;
-    }
-    getMany() {
+const configuration_1 = require("../../config/configuration");
+const typeorm_1 = require("typeorm");
+const { database: { type: dbType, host, port, username, password, database, entities } } = configuration_1.default();
+let ConnectionService = class ConnectionService {
+    init() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.service.getManyTrades();
+            this.connection = yield typeorm_1.createConnection({
+                type: dbType,
+                host,
+                port,
+                username,
+                password,
+                database,
+                entities,
+                synchronize: true,
+            });
         });
     }
-    createOne({ body }, reply) {
+    destroy() {
         return __awaiter(this, void 0, void 0, function* () {
-            reply.status(201).send(yield this.service.createOneTrade(body));
-        });
-    }
-    goodbyeHandler() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return 'Bye-bye!!!';
-        });
-    }
-    getManyByUserId({ params }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.service.getManyTradesByUserId(params.user_id);
+            yield this.connection.close();
         });
     }
 };
 __decorate([
-    fastify_decorators_1.GET('/'),
+    fastify_decorators_1.Initializer(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], TradesController.prototype, "getMany", null);
+], ConnectionService.prototype, "init", null);
 __decorate([
-    fastify_decorators_1.POST('/', {
-        schema: {
-            body: trade_dto_1.CreateTradeSchema,
-        },
-    }),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", Promise)
-], TradesController.prototype, "createOne", null);
-__decorate([
-    fastify_decorators_1.GET({ url: '/goodbye' }),
+    fastify_decorators_1.Destructor(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], TradesController.prototype, "goodbyeHandler", null);
-__decorate([
-    fastify_decorators_1.GET('/users/:user_id'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], TradesController.prototype, "getManyByUserId", null);
-TradesController = __decorate([
-    fastify_decorators_1.Controller({ route: '/trades' }),
-    __metadata("design:paramtypes", [trades_service_1.TradesService])
-], TradesController);
-exports.TradesController = TradesController;
-exports.default = TradesController;
-//# sourceMappingURL=trades.controller.js.map
+], ConnectionService.prototype, "destroy", null);
+ConnectionService = __decorate([
+    fastify_decorators_1.Service()
+], ConnectionService);
+exports.ConnectionService = ConnectionService;
+//# sourceMappingURL=connection.service.js.map

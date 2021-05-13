@@ -18,50 +18,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TradesService = void 0;
+exports.StocksService = void 0;
 const fastify_decorators_1 = require("fastify-decorators");
-const trade_entity_1 = require("../entities/trade.entity");
+const stock_entity_1 = require("../entities/stock.entity");
 const connection_service_1 = require("../../db/providers/connection.service");
 const date_fns_1 = require("date-fns");
-let TradesService = class TradesService {
+let StocksService = class StocksService {
     constructor(connectionService) {
         this.connectionService = connectionService;
     }
     init() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.repository = this.connectionService.connection.getRepository(trade_entity_1.TradeEntity);
+            this.repository = this.connectionService.connection.getRepository(stock_entity_1.StockEntity);
         });
     }
-    hello(body) {
-        return `Hello world! ${JSON.stringify(body)}`;
-    }
-    getManyTrades() {
+    getPeriodHighLowStockPrices(symbol, start, end) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.repository.find();
-        });
-    }
-    createOneTrade(body) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (body.timestamp) {
-                body.timestamp = date_fns_1.parse(body.timestamp, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString();
-                console.log({ body });
+            start = start ? date_fns_1.parse(start, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString() : undefined;
+            end = end ? date_fns_1.parse(end, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString() : undefined;
+            const prices = (yield this.repository.query(`SELECT price
+        FROM trades 
+        WHERE
+          symbol = $1 AND timestamp >= $2 AND timestamp <= $3
+      `, [symbol, start, end])).map((obj) => obj.price)
+                .sort((a, b) => a - b);
+            console.log({ symbol, start, end, prices });
+            if (prices.length > 0) {
+                const [lowest, highest] = [prices[0], prices[prices.length - 1]];
+                return { symbol, highest, lowest };
             }
-            return this.repository.save(this.repository.merge(new trade_entity_1.TradeEntity(), body));
-        });
-    }
-    getManyTradesByUserId(userId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log('USERID', userId);
-            return this.repository
-                .createQueryBuilder('trade')
-                .select()
-                .where(`"user" ->> 'id' = '${userId}'`)
-                .getMany();
-        });
-    }
-    deleteAllTrades() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.repository.query(`TRUNCATE TABLE trades`);
+            else {
+                return {
+                    message: "There are no trades in the given date range"
+                };
+            }
         });
     }
 };
@@ -70,10 +60,10 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], TradesService.prototype, "init", null);
-TradesService = __decorate([
+], StocksService.prototype, "init", null);
+StocksService = __decorate([
     fastify_decorators_1.Service(),
     __metadata("design:paramtypes", [connection_service_1.ConnectionService])
-], TradesService);
-exports.TradesService = TradesService;
-//# sourceMappingURL=trades.service.js.map
+], StocksService);
+exports.StocksService = StocksService;
+//# sourceMappingURL=stocks.service.js.map

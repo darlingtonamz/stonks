@@ -15,41 +15,56 @@
 //   });
 //   done();
 // }
-import { plainToClass } from 'class-transformer';
-import { validate } from 'class-validator';
-import {
-  FastifyRequest
-  // FastifyReply,
-} from 'fastify';
-import { Controller, GET } from 'fastify-decorators';
-import { CreateTradeDTO } from '../dtos/trade.dto';
+// import { plainToClass } from 'class-transformer';
+// import { validate } from 'class-validator';
+import { FastifyReply } from 'fastify';
+// import {
+//   FastifyRequest
+//   // FastifyReply,
+// } from 'fastify';
+import { Controller, GET, POST } from 'fastify-decorators';
+import { CreateTradeDTO, CreateTradeSchema } from '../dtos/trade.dto';
 import { TradesService } from '../providers/trades.service';
 
 @Controller({ route: '/trades' })
 export class TradesController {
   constructor(public service: TradesService) {}
 
-  @GET('/', {
-    // schema: {},
-    validatorCompiler: () => async (data) => {
-      const object = plainToClass(CreateTradeDTO, data);
-      const errors = await validate(object);
-      // if (errors.length > 0) {
-      //   throw new BadRequestException(errors);
-      // }
-      return errors.length > 0 ? {error: errors} : { value: data };
-    } 
+  @GET('/')
+  async getMany() {
+    return this.service.getManyTrades();
+  }
+
+  @POST('/', {
+    schema: {
+      body: CreateTradeSchema,
+    },
+    // errorHandler: (error, _, reply) => {
+    //   console.log('Validator X1 ############', error)
+    //   if (error.validation) {
+    //     console.log('Validator X2 ############', error)
+    //      reply.status(422).send(new Error('validation failed'))
+    //   }
+    // }
   })
-  async helloHandler(
-    request: FastifyRequest,
-    // reply: FastifyReply
+  async createOne(
+    { body }: { body: CreateTradeDTO },
+    reply: FastifyReply
   ) {
-    return this.service.hello(request.body);
+    reply.status(201).send(await this.service.createOneTrade(body));
   }
 
   @GET({ url: '/goodbye' })
   async goodbyeHandler() {
     return 'Bye-bye!!!';
+  }
+
+  @GET('/users/:user_id')
+  async getManyByUserId(
+    {params}: {params: any}
+  ) {
+    // TODO - MAke User entity
+    return this.service.getManyTradesByUserId(params.user_id);
   }
 }
 

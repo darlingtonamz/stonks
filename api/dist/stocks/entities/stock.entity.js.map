@@ -1,0 +1,1 @@
+{"version":3,"file":"stock.entity.js","sourceRoot":"","sources":["../../../src/stocks/entities/stock.entity.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,2EAAuE;AACvE,qCAAyC;AAGzC,IAAa,WAAW,GAAxB,MAAa,WAAY,SAAQ,gCAAc;CAI9C,CAAA;AADC;IADC,gBAAM,CAAC,EAAE,IAAI,EAAE,MAAM,EAAE,QAAQ,EAAE,KAAK,EAAE,CAAC;;2CACpB;AAHX,WAAW;IADvB,gBAAM,CAAC,QAAQ,CAAC;GACJ,WAAW,CAIvB;AAJY,kCAAW"}

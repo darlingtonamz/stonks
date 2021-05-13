@@ -42,5 +42,32 @@ export class CreateTradeDTO {
   @IsNotEmpty()
   @IsDefined()
   @IsString()
-  public timestamp: Date;
+  public timestamp: string;
 }
+
+export const TradeSchema: any = {
+  //  TODO format timestamp to yyyy-MM-dd HH:mm:ss
+  type: 'object',
+  properties: {
+    type: { type: 'string' },
+    user: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        name: { type: 'string' },
+      },
+      additionalProperties: false,
+    },
+    symbol: { type: 'string' },
+    shares: { type: 'integer' },
+    price: { type: 'number' },
+    timestamp: { type: 'string' },
+  },
+  additionalProperties: false
+};
+
+export const CreateTradeSchema = {
+  type: 'object',
+  properties:  TradeSchema.properties,
+  required: ['type', 'user', 'symbol', 'shares', 'price', 'timestamp']
+};

@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateTradeDTO = exports.TradeUserDTO = void 0;
+exports.CreateTradeSchema = exports.TradeSchema = exports.CreateTradeDTO = exports.TradeUserDTO = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
 class TradeUserDTO {
@@ -63,7 +63,31 @@ __decorate([
     class_validator_1.IsNotEmpty(),
     class_validator_1.IsDefined(),
     class_validator_1.IsString(),
-    __metadata("design:type", Date)
+    __metadata("design:type", String)
 ], CreateTradeDTO.prototype, "timestamp", void 0);
 exports.CreateTradeDTO = CreateTradeDTO;
+exports.TradeSchema = {
+    type: 'object',
+    properties: {
+        type: { type: 'string' },
+        user: {
+            type: 'object',
+            properties: {
+                id: { type: 'string' },
+                name: { type: 'string' },
+            },
+            additionalProperties: false,
+        },
+        symbol: { type: 'string' },
+        shares: { type: 'integer' },
+        price: { type: 'number' },
+        timestamp: { type: 'string' },
+    },
+    additionalProperties: false
+};
+exports.CreateTradeSchema = {
+    type: 'object',
+    properties: exports.TradeSchema.properties,
+    required: ['type', 'user', 'symbol', 'shares', 'price', 'timestamp']
+};
 //# sourceMappingURL=trade.dto.js.map

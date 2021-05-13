@@ -18,67 +18,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TradesController = void 0;
+exports.TradeStocksController = void 0;
 const fastify_decorators_1 = require("fastify-decorators");
-const trade_dto_1 = require("../dtos/trade.dto");
 const trades_service_1 = require("../providers/trades.service");
-let TradesController = class TradesController {
+let TradeStocksController = class TradeStocksController {
     constructor(service) {
         this.service = service;
     }
-    getMany() {
+    getPeriodHighLowTradePrices() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.service.getManyTrades();
-        });
-    }
-    createOne({ body }, reply) {
-        return __awaiter(this, void 0, void 0, function* () {
-            reply.status(201).send(yield this.service.createOneTrade(body));
-        });
-    }
-    goodbyeHandler() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return 'Bye-bye!!!';
-        });
-    }
-    getManyByUserId({ params }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return this.service.getManyTradesByUserId(params.user_id);
+            return this.service.deleteAllTrades();
         });
     }
 };
 __decorate([
-    fastify_decorators_1.GET('/'),
+    fastify_decorators_1.DELETE('/erase'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], TradesController.prototype, "getMany", null);
-__decorate([
-    fastify_decorators_1.POST('/', {
-        schema: {
-            body: trade_dto_1.CreateTradeSchema,
-        },
-    }),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
-    __metadata("design:returntype", Promise)
-], TradesController.prototype, "createOne", null);
-__decorate([
-    fastify_decorators_1.GET({ url: '/goodbye' }),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], TradesController.prototype, "goodbyeHandler", null);
-__decorate([
-    fastify_decorators_1.GET('/users/:user_id'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], TradesController.prototype, "getManyByUserId", null);
-TradesController = __decorate([
-    fastify_decorators_1.Controller({ route: '/trades' }),
+], TradeStocksController.prototype, "getPeriodHighLowTradePrices", null);
+TradeStocksController = __decorate([
+    fastify_decorators_1.Controller({ route: '/erase' }),
     __metadata("design:paramtypes", [trades_service_1.TradesService])
-], TradesController);
-exports.TradesController = TradesController;
-exports.default = TradesController;
-//# sourceMappingURL=trades.controller.js.map
+], TradeStocksController);
+exports.TradeStocksController = TradeStocksController;
+exports.default = TradeStocksController;
+//# sourceMappingURL=tradeStocks.controller.js.map

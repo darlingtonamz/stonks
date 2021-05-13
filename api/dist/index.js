@@ -9,18 +9,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.appModules = void 0;
 require("reflect-metadata");
 const fastify_1 = require("fastify");
 const configuration_1 = require("./config/configuration");
 const trades_module_1 = require("./trades/trades.module");
 const fastify_decorators_1 = require("fastify-decorators");
+const trades_module_2 = require("./stocks/trades.module");
 const { port: PORT } = configuration_1.default();
 const server = fastify_1.default({ logger: true });
-const modules = [
+exports.appModules = [
     trades_module_1.TradesModule,
+    trades_module_2.StocksModule,
 ];
 let controllers = [];
-for (const module of modules) {
+for (const module of exports.appModules) {
     controllers = controllers.concat(module.controllers);
 }
 server.register(fastify_decorators_1.bootstrap, {
