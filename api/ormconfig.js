@@ -1,4 +1,4 @@
-const configuration = require('./dist/config/configuration');
+const configuration = require('./dist/src/config/configuration');
 
 const { database } = configuration.default();
 

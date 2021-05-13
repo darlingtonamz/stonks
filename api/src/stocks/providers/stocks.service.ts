@@ -30,14 +30,15 @@ export class StocksService {
     start = start ? parse(start, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString() : undefined;
     end = end ? parse(end, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString() : undefined;
     const prices = (
-      await this.repository.query(`SELECT price
-        FROM trades 
-        WHERE
-          symbol = $1 AND timestamp >= $2 AND timestamp <= $3
-      `, [symbol, start, end])
-    ).map((obj: {price: number}) => obj.price)
-    .sort((a: number, b: number) => a - b);
-    console.log({symbol, start, end, prices})
+        await this.repository.query(`SELECT price
+          FROM trades 
+          WHERE
+            symbol = $1 AND timestamp >= $2 AND timestamp <= $3
+        `, [symbol, start, end])
+      )
+      .map((obj: {price: number}) => obj.price)
+      .sort((a: number, b: number) => a - b);
+
     if (prices.length > 0) {
       const [lowest, highest] = [prices[0], prices[prices.length - 1]];
       return { symbol, highest, lowest }
@@ -47,5 +48,15 @@ export class StocksService {
         message: "There are no trades in the given date range"
       }
     }
+  }
+
+  public async getStockStats(
+    start?: string,
+    end?: string,
+  ): Promise<any[]> {
+    start = start ? parse(start, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString() : undefined;
+    end = end ? parse(end, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString() : undefined;
+
+    return Promise.resolve([{start, end}]);
   }
 }

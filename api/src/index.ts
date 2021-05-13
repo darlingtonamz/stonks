@@ -1,17 +1,14 @@
 import "reflect-metadata";
 import Fastify, {
   FastifyInstance,
-  // FastifyServerOptions,
   RouteShorthandOptions,
-  // FastifyRequest,
 } from 'fastify';
 import config from './config/configuration';
 import { TradesModule } from "./trades/trades.module";
 import { bootstrap } from 'fastify-decorators';
-// import { resolve } from 'path';
 import { Constructor } from "fastify-decorators/decorators/helpers/inject-dependencies";
 import { IAppModule } from "./common/interfaces/interfaces";
-import { StocksModule } from "./stocks/trades.module";
+import { StocksModule } from "./stocks/stocks.module";
 
 const { port: PORT } = config();
 
@@ -58,31 +55,18 @@ const opts: RouteShorthandOptions = {
   }
 }
 
-server.get('/health', opts, async (
-  // request: FastifyRequest,
-  // reply: FastifyRequest,
-) => {
+server.get('/health', opts, async () => {
   return { pong: 'it worked!' }
-})
-
-server.get('/ping', opts, async (
-  // request: FastifyRequest,
-  // reply: FastifyRequest,
-) => {
-  return { pong: 'it worked!' }
-})
+});
 
 const start = async () => {
   try {
-    await server.listen(PORT, '0.0.0.0')
-
-    // const address = server.server.address()
-    // const port = typeof address === 'string' ? address : address?.port
-    console.log(`API running at port ${PORT}`)
+    await server.listen(PORT, '0.0.0.0');
+    console.log(`API running at port ${PORT}`);
 
   } catch (err) {
-    server.log.error(err)
-    process.exit(1)
+    server.log.error(err);
+    process.exit(1);
   }
 }
-start()
+start();

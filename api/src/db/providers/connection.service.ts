@@ -3,7 +3,7 @@ import { Initializer, Destructor, Service } from 'fastify-decorators';
 import configuration from '../../config/configuration';
 import { createConnection, Connection } from 'typeorm';
 // const { database: { type, host, port, username, password, database, entities } } = configuration();
-const { database: { type: dbType, host, port, username, password, database, entities } } = configuration();
+const { database: { type: dbType, host, port, username, password, database, entities, namingStrategy } } = configuration();
 
 @Service()
 export class ConnectionService {
@@ -24,7 +24,8 @@ export class ConnectionService {
       password,
       database,
       entities,
-      synchronize: true,
+      namingStrategy,
+      synchronize: false, // prevent auto migration based on entity edits
     });
   }
 

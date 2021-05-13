@@ -61,7 +61,12 @@ export const TradeSchema: any = {
     symbol: { type: 'string' },
     shares: { type: 'integer' },
     price: { type: 'number' },
-    timestamp: { type: 'string' },
+    timestamp: {
+      type: 'string',
+      // format: 'date-time',
+      // customDateTimePattern : "yyyy-MM-dd'T'HH:mm:ssZ",
+      // customTimezone: 'PDT',
+    },
   },
   additionalProperties: false
 };

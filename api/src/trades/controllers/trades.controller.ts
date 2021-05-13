@@ -1,30 +1,23 @@
-// import { FastifyInstance, FastifyLoggerInstance } from "fastify"
-// import {
-//   ServerResponse
-// } from "http"
-// import { IncomingMessage } from "http"
-// import { Server } from "http"
-
-// export const TradesController = (
-//   fastify: FastifyInstance<Server, IncomingMessage, ServerResponse, FastifyLoggerInstance>,
-//   opt: any,
-//   done: Function
-// ) => {
-//   fastify.get('/trades', (_, reply) => {
-//     reply.send({ hello: 'Trades', opt });
-//   });
-//   done();
-// }
-// import { plainToClass } from 'class-transformer';
-// import { validate } from 'class-validator';
 import { FastifyReply } from 'fastify';
-// import {
-//   FastifyRequest
-//   // FastifyReply,
-// } from 'fastify';
 import { Controller, GET, POST } from 'fastify-decorators';
 import { CreateTradeDTO, CreateTradeSchema } from '../dtos/trade.dto';
 import { TradesService } from '../providers/trades.service';
+import { format } from 'date-fns';
+
+function tradeSerializer(data: any) {
+  let output;
+  if (Array.isArray(data)) {
+    output = data.map((trade) => {
+      trade.timestamp = format(trade.timestamp, 'yyyy-MM-dd HH:mm:SS');
+    })
+  } else {
+    output = {
+      ...data,
+      timestamp: format(data.timestamp, 'yyyy-MM-dd HH:mm:SS')
+    };
+  }
+  return JSON.stringify(output);
+};
 
 @Controller({ route: '/trades' })
 export class TradesController {
@@ -51,13 +44,17 @@ export class TradesController {
     { body }: { body: CreateTradeDTO },
     reply: FastifyReply
   ) {
-    reply.status(201).send(await this.service.createOneTrade(body));
+    reply
+      .status(201)
+      .header('Content-Type', 'application/json')
+      .serializer(tradeSerializer)
+    return this.service.createOneTrade(body, reply);
   }
 
-  @GET({ url: '/goodbye' })
-  async goodbyeHandler() {
-    return 'Bye-bye!!!';
-  }
+  // @GET({ url: '/goodbye' })
+  // async goodbyeHandler() {
+  //   return 'Bye-bye!!!';
+  // }
 
   @GET('/users/:user_id')
   async getManyByUserId(

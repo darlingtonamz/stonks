@@ -1,5 +1,7 @@
 import { InstanceEntity } from "../../common/entities/instance.entity";
-import { Entity, Column, CreateDateColumn } from "typeorm";
+import { Entity, Column, CreateDateColumn, JoinColumn } from "typeorm";
+import { ManyToOne } from "typeorm";
+import { StockEntity } from "../../stocks/entities/stock.entity";
 
 interface ITradeUser {
   id: string;
@@ -27,4 +29,13 @@ export class TradeEntity extends InstanceEntity {
   public timestamp: Date;
 
   // TODO - Index user and symbol
+
+  @ManyToOne(
+    () => StockEntity,
+    (stock) => stock.trades,
+    { onDelete: 'CASCADE' },
+  )
+  @JoinColumn({ name: 'symbol', referencedColumnName: 'symbol' })
+  stock: StockEntity;
+
 }

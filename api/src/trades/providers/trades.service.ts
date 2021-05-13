@@ -4,6 +4,7 @@ import { CreateTradeDTO } from '../dtos/trade.dto';
 import { TradeEntity } from '../entities/trade.entity';
 import { ConnectionService } from '../../db/providers/connection.service';
 import { parse } from 'date-fns';
+import { FastifyReply } from 'fastify';
 
 @Service()
 export class TradesService {
@@ -27,10 +28,16 @@ export class TradesService {
   }
 
   // Create one Trade
-  public async createOneTrade(body: CreateTradeDTO): Promise<TradeEntity> {
+  public async createOneTrade(
+    body: CreateTradeDTO,
+    reply: FastifyReply
+  ): Promise<TradeEntity> {
     if (body.timestamp) {
-      body.timestamp = parse(body.timestamp, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString();
-      console.log({body})
+      const parsed = parse(body.timestamp, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString();
+      if (parsed == 'Invalid Date') {
+        reply.status(400)
+        throw Error(`Invalid DateTime string (${body.timestamp}). Please format your string the way 'yyyy-MM-dd HH:mm:SS'`)
+      }
     }
     
     return this.repository.save(
