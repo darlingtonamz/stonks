@@ -9,8 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TradesService = void 0;
 const fastify_decorators_1 = require("fastify-decorators");
 let TradesService = class TradesService {
-    hello(request, reply) {
-        return `Hello world! ${JSON.stringify(request)} | ${JSON.stringify(reply)}`;
+    hello(body) {
+        return `Hello world! ${body}`;
     }
 };
 TradesService = __decorate([

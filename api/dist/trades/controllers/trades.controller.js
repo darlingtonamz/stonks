@@ -19,27 +19,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TradesController = void 0;
+const class_transformer_1 = require("class-transformer");
+const class_validator_1 = require("class-validator");
 const fastify_decorators_1 = require("fastify-decorators");
+const trade_dto_1 = require("../dtos/trade.dto");
 const trades_service_1 = require("../providers/trades.service");
 let TradesController = class TradesController {
     constructor(service) {
         this.service = service;
     }
-    helloHandler(request, reply) {
+    helloHandler(request) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.service.hello(request, reply);
+            return this.service.hello(request.body);
         });
     }
     goodbyeHandler() {
         return __awaiter(this, void 0, void 0, function* () {
-            return 'Bye-bye!';
+            return 'Bye-bye!!';
         });
     }
 };
 __decorate([
-    fastify_decorators_1.GET({ url: '/' }),
+    fastify_decorators_1.GET('/', {
+        validatorCompiler: () => (data) => __awaiter(void 0, void 0, void 0, function* () {
+            const object = class_transformer_1.plainToClass(trade_dto_1.CreateTradeDTO, data);
+            const errors = yield class_validator_1.validate(object);
+            return errors.length > 0 ? { error: errors } : { value: data };
+        })
+    }),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], TradesController.prototype, "helloHandler", null);
 __decorate([

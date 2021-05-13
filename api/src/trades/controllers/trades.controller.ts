@@ -49,7 +49,7 @@ export class TradesController {
 
   @GET({ url: '/goodbye' })
   async goodbyeHandler() {
-    return 'Bye-bye!';
+    return 'Bye-bye!!!';
   }
 }
 

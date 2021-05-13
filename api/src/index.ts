@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import Fastify, {
   FastifyInstance,
+  // FastifyServerOptions,
   RouteShorthandOptions,
   // FastifyRequest,
 } from 'fastify';
@@ -11,8 +12,9 @@ import { bootstrap } from 'fastify-decorators';
 import { Constructor } from "fastify-decorators/decorators/helpers/inject-dependencies";
 import { IAppModule } from "./common/interfaces/interfaces";
 
-const PORT = config().port;
+const { port: PORT } = config();
 
+// const test: FastifyServerOptions;
 const server: FastifyInstance = Fastify({ logger: true });
 
 const modules: IAppModule[] = [
@@ -57,7 +59,7 @@ server.get('/ping', opts, async (
 
 const start = async () => {
   try {
-    await server.listen(PORT)
+    await server.listen(PORT, '0.0.0.0')
 
     // const address = server.server.address()
     // const port = typeof address === 'string' ? address : address?.port

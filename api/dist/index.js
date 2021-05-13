@@ -14,7 +14,7 @@ const fastify_1 = require("fastify");
 const configuration_1 = require("./config/configuration");
 const trades_module_1 = require("./trades/trades.module");
 const fastify_decorators_1 = require("fastify-decorators");
-const PORT = configuration_1.default().port;
+const { port: PORT } = configuration_1.default();
 const server = fastify_1.default({ logger: true });
 const modules = [
     trades_module_1.TradesModule,
@@ -48,7 +48,7 @@ server.get('/ping', opts, () => __awaiter(void 0, void 0, void 0, function* () {
 }));
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield server.listen(PORT);
+        yield server.listen(PORT, '0.0.0.0');
         console.log(`API running at port ${PORT}`);
     }
     catch (err) {
