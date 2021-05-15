@@ -4,8 +4,6 @@ import { SnakeNamingStrategy } from '../db/naming';
 export default (): IConfig => {
   const config: IConfig = {
     environment: process.env.ENVIRONMENT || 'dev',
-    // protocol: process.env.PROTOCOL,
-    // host: process.env.VIRTUAL_HOST.split(',')[0],
     port: parseInt(process.env.PORT || '', 10) || 3000,
     database: {
       type: 'postgres',

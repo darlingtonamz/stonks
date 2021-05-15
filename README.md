@@ -63,5 +63,9 @@ Backend app will be accessible on http://api.stonk.local
 
 ## Things to improve on
 - Authentication of `Users`
-- Authorization
+- Authorization of `Users`
 - Full CRUD for all Major Entities [`Trades`, `Stock`, `Users`]
+- Add Linting Fix with ESLint
+- Configure testing through `make test` using proper `docker-compose.test.yml`
+- Reformating strings payloads with trailing spaces in Request.body
+- Implement a `BaseController` - To abstract some of the bloat in the current controllers

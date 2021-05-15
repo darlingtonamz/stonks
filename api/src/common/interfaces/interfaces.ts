@@ -2,5 +2,4 @@ import { Constructor } from "fastify-decorators/decorators/helpers/inject-depend
 
 export interface IAppModule {
   controllers: Constructor<unknown>[];
-  // entities: Function[];
 }

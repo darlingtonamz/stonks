@@ -24,8 +24,6 @@ interface IDatabaseConfig {
 
 export interface IConfig {
   environment?: string;
-  // protocol: string,
-  // host: string,
   port: number;
   database: IDatabaseConfig;
 }

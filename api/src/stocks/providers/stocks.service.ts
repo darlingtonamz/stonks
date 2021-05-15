@@ -133,7 +133,6 @@ export class StocksService {
               newTrajectory = 'ASC';
               maxRise = absPriceDiff > maxRise ? absPriceDiff : maxRise;
             }
-            // console.log('############', { currentTrajectory, newTrajectory, priceDiff, absPriceDiff, maxFall, maxRise})
           }
           if (currentTrajectory != newTrajectory) {
             fluctuations += 1;

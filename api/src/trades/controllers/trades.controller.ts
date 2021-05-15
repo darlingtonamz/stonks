@@ -41,13 +41,6 @@ export class TradesController {
     schema: {
       body: CreateTradeSchema,
     },
-    // errorHandler: (error, _, reply) => {
-    //   console.log('Validator X1 ############', error)
-    //   if (error.validation) {
-    //     console.log('Validator X2 ############', error)
-    //      reply.status(422).send(new Error('validation failed'))
-    //   }
-    // }
   })
   async createOne(
     { body }: { body: CreateTradeDTO },
@@ -64,7 +57,7 @@ export class TradesController {
   async getManyByUserId(
     {params}: {params: any}
   ) {
-    // TODO - MAke User entity
+    // TODO - MAke User a entity/module
     return this.service.getManyTradesByUserId(params.user_id);
   }
 }

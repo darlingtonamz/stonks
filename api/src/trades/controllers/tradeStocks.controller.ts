@@ -6,7 +6,7 @@ export class TradeStocksController {
   constructor(public service: TradesService) {}
 
   @DELETE('/')
-  async getPeriodHighLowTradePrices() {
+  async deleteAllTrades() {
     return this.service.deleteAllTrades();
   }
 }
