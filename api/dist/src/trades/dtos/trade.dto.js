@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateTradeSchema = exports.TradeSchema = exports.CreateTradeDTO = exports.TradeUserDTO = void 0;
 const class_validator_1 = require("class-validator");
 const class_transformer_1 = require("class-transformer");
+const constants_1 = require("../../common/constants/constants");
 class TradeUserDTO {
 }
 __decorate([
@@ -71,6 +72,7 @@ exports.TradeSchema = {
     properties: {
         type: {
             type: 'string',
+            enum: Object.values(constants_1.TradeType),
         },
         user: {
             type: 'object',
@@ -81,8 +83,16 @@ exports.TradeSchema = {
             additionalProperties: false,
         },
         symbol: { type: 'string' },
-        shares: { type: 'integer' },
-        price: { type: 'number' },
+        shares: {
+            type: 'integer',
+            minimum: 10,
+            maximum: 30,
+        },
+        price: {
+            type: 'number',
+            minimum: 130.42,
+            maximum: 195.65,
+        },
         timestamp: {
             type: 'string',
         },

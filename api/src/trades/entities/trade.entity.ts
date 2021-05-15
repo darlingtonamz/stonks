@@ -8,7 +8,7 @@ interface ITradeUser {
   name: string;
 }
 
-export enum TradeType {
+export enum TradeTypeEnum {
   Buy = 'buy',
   Sell = 'sell',
 }
@@ -16,7 +16,7 @@ export enum TradeType {
 @Entity('trades')
 export class TradeEntity extends InstanceEntity {
   @Column()
-  public type: TradeType;
+  public type: TradeTypeEnum;
 
   @Index('idx_trades_user')
   @Column({ type: 'jsonb', nullable: true })

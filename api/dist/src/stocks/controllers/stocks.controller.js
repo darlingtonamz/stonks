@@ -28,7 +28,8 @@ let StocksController = class StocksController {
     }
     createOne({ body }, reply) {
         return __awaiter(this, void 0, void 0, function* () {
-            reply.status(201).send(yield this.service.createOneStock(body));
+            reply.status(201);
+            return this.service.createOneStock(body);
         });
     }
     getPeriodHighLowTradePrices({ params, query }) {
@@ -37,10 +38,10 @@ let StocksController = class StocksController {
             return this.service.getPeriodHighLowStockPrices(params.stock_symbol, start, end);
         });
     }
-    getStats({ query }, reply) {
+    getStats({ query }) {
         return __awaiter(this, void 0, void 0, function* () {
             const { start, end } = query;
-            return this.service.getStockStats(reply, start, end);
+            return this.service.getStockStats(start, end);
         });
     }
 };
@@ -63,7 +64,7 @@ __decorate([
 __decorate([
     fastify_decorators_1.GET('/stats'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], StocksController.prototype, "getStats", null);
 StocksController = __decorate([

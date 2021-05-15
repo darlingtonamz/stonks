@@ -1,14 +1,19 @@
-import { Repository } from 'typeorm';
-import { Initializer, Service } from 'fastify-decorators';
+import { FindConditions, FindOneOptions, Repository } from 'typeorm';
+import { Initializer, Inject, Service } from 'fastify-decorators';
 import { CreateTradeDTO } from '../dtos/trade.dto';
 import { TradeEntity } from '../entities/trade.entity';
 import { ConnectionService } from '../../db/providers/connection.service';
 import { parse } from 'date-fns';
-import { FastifyReply } from 'fastify';
+import { StocksService } from '../../stocks/providers/stocks.service';
+// import { FastifyReply } from 'fastify';
 
 @Service()
 export class TradesService {
   private repository!: Repository<TradeEntity>;
+  
+  @Inject(StocksService)
+  private stocksService!: StocksService;
+
   constructor(private connectionService: ConnectionService) {}
 
   @Initializer([ConnectionService])
@@ -21,6 +26,20 @@ export class TradesService {
     return `Hello world! ${JSON.stringify(body)}`;
   }
 
+  public async getOneTrade(query: FindConditions<TradeEntity>, options?: FindOneOptions): Promise<TradeEntity> {
+    let trade: TradeEntity | undefined;
+    try {
+      trade = await this.repository.findOne(query, options);
+    } catch (e) {
+      // throw new DBErrorException(e);
+      throw { statusCode: 500, message: e }
+    }
+    if (!trade) {
+      throw { statusCode: 404, message: `Trade ${JSON.stringify(query)} not found` }
+    }
+    return trade;
+  }
+
   // Get all the Trades in the DB
   public async getManyTrades(): Promise<TradeEntity[]> {
     // TODO - Sort in ASC order with ID
@@ -30,13 +49,18 @@ export class TradesService {
   // Create one Trade
   public async createOneTrade(
     body: CreateTradeDTO,
-    reply: FastifyReply
+    // reply: FastifyReply
   ): Promise<TradeEntity> {
+    // await this.getOneTrade({ symbol: body.symbol });
+    // Using this to verify if the Stock exists
+    await this.stocksService.getOneStock({ symbol: body.symbol });
+
     if (body.timestamp) {
       const parsed = parse(body.timestamp, 'yyyy-MM-dd HH:mm:ss', new Date()).toDateString();
       if (parsed == 'Invalid Date') {
-        reply.status(400)
-        throw Error(`Invalid DateTime string (${body.timestamp}). Please format your string the way 'yyyy-MM-dd HH:mm:SS'`)
+        // reply.status(400)
+        // throw Error(`Invalid DateTime string (${body.timestamp}). Please format your string the way 'yyyy-MM-dd HH:mm:SS'`)
+        throw { statusCode: 400, message: `Invalid DateTime string (${body.timestamp}). Please format your string the way 'yyyy-MM-dd HH:mm:SS'` }
       }
     }
     

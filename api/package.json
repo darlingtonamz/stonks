@@ -14,10 +14,16 @@
     "build": "tsc --project ./",
     "migration:run": "yarn run prebuild; yarn run build; ./node_modules/typeorm/cli.js migration:run",
     "migration:reset": "yarn run build; ./node_modules/typeorm/cli.js migration:reset",
-    "migration:generate": "yarn run prebuild; yarn run build; ./node_modules/typeorm/cli.js migration:generate"
+    "migration:generate": "yarn run prebuild; yarn run build; ./node_modules/typeorm/cli.js migration:generate",
+    "test": "TESTING=true node --max-old-space-size=4096 ./node_modules/.bin/jest --runInBand --logHeapUsage --forceExit",
+    "test:e2e": "TESTING=true jest --runInBand --forceExit --logHeapUsage --config=jest.e2e.config.js --no-cache",
+    "test:unit": "TESTING=true jest --runInBand --forceExit --logHeapUsage --config=jest.unit.config.js"
   },
   "dependencies": {
+    "@types/jest": "^26.0.23",
     "@types/shortid": "^0.0.29",
+    "ajv": "7.x",
+    "ajv-errors": "^3.0.0",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "connect-redis": "^5.1.0",
@@ -26,9 +32,12 @@
     "date-fns": "^2.21.3",
     "fastify": "^3.15.1",
     "fastify-decorators": "^3.9.1",
+    "jest": "^26.6.3",
+    "jest-environment-node": "^26.6.2",
     "pg": "^8.5.1",
     "reflect-metadata": "^0.1.13",
     "shortid": "^2.2.16",
+    "ts-jest": "^26.5.6",
     "ts-node": "^9.1.1",
     "ts-node-dev": "^1.1.6",
     "typeorm": "^0.2.32"

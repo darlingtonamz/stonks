@@ -1,5 +1,6 @@
 import { IsDefined, IsInt, IsNotEmpty, IsNumber, IsObject, IsString, ValidateNested } from "class-validator";
 import { Type } from 'class-transformer';
+import { TradeType } from "../../common/constants/constants";
 
 export class TradeUserDTO {
   @IsDefined()
@@ -46,12 +47,16 @@ export class CreateTradeDTO {
 }
 
 export const TradeSchema: any = {
-  //  TODO format timestamp to yyyy-MM-dd HH:mm:ss
   type: 'object',
   properties: {
     type: {
       type: 'string',
-      // enum: 
+      enum: Object.values(TradeType),
+      // errorMessage: {
+      //   type: 'Bad age',
+      //   enum: `body.type should be equal to one of the allowed values [${Object.values(TradeType)}]`
+      // //   // min: 'Too young',
+      // }
     },
     user: {
       type: 'object',
@@ -62,13 +67,18 @@ export const TradeSchema: any = {
       additionalProperties: false,
     },
     symbol: { type: 'string' },
-    shares: { type: 'integer' },
-    price: { type: 'number' },
+    shares: {
+      type: 'integer',
+      minimum: 10,
+      maximum: 30,
+    },
+    price: {
+      type: 'number',
+      minimum: 130.42,
+      maximum: 195.65,
+    },
     timestamp: {
       type: 'string',
-      // format: 'date-time',
-      // customDateTimePattern : "yyyy-MM-dd'T'HH:mm:ssZ",
-      // customTimezone: 'PDT',
     },
   },
   additionalProperties: false

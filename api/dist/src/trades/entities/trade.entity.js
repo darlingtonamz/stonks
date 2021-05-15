@@ -9,16 +9,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TradeEntity = exports.TradeType = void 0;
+exports.TradeEntity = exports.TradeTypeEnum = void 0;
 const instance_entity_1 = require("../../common/entities/instance.entity");
 const typeorm_1 = require("typeorm");
 const typeorm_2 = require("typeorm");
 const stock_entity_1 = require("../../stocks/entities/stock.entity");
-var TradeType;
-(function (TradeType) {
-    TradeType["Buy"] = "buy";
-    TradeType["Sell"] = "sell";
-})(TradeType = exports.TradeType || (exports.TradeType = {}));
+var TradeTypeEnum;
+(function (TradeTypeEnum) {
+    TradeTypeEnum["Buy"] = "buy";
+    TradeTypeEnum["Sell"] = "sell";
+})(TradeTypeEnum = exports.TradeTypeEnum || (exports.TradeTypeEnum = {}));
 let TradeEntity = class TradeEntity extends instance_entity_1.InstanceEntity {
 };
 __decorate([

@@ -1,4 +1,4 @@
-import { FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { Controller, GET, POST } from 'fastify-decorators';
 import { CreateStockDTO, CreateStockSchema } from '../dtos/stock.dto';
 import { StocksService } from '../providers/stocks.service';
@@ -16,10 +16,11 @@ export class StocksController {
     { body }: { body: CreateStockDTO },
     reply: FastifyReply
   ) {
-    reply.status(201).send(await this.service.createOneStock(reply, body));
+    reply.status(201)
+    return this.service.createOneStock(body);
   }
 
-  // api.amanze.local/stocks/AC/price?start=2014-06-14 13:13:13&end=2014-06-14 13:13:13
+  // api.amanze.local/stocks/AC/price?start=2014-06-14&end=2014-06-14
   @GET('/:stock_symbol/price')
   async getPeriodHighLowTradePrices(
     { params, query }: { params: any, query: any }
@@ -30,11 +31,10 @@ export class StocksController {
 
   @GET('/stats')
   async getStats(
-    { query }: { query: any },
-    reply: FastifyReply
+    { query }: FastifyRequest,
   ) {
-    const { start, end } = query;
-    return this.service.getStockStats(reply, start, end);
+    const { start, end } = query as any;
+    return this.service.getStockStats(start, end);
   }
 }
 

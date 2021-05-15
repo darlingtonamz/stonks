@@ -19,7 +19,7 @@ docker run -d -p 80:80 --name=nginx-reverse-proxy --network=nginx_proxy --restar
 host$ > sudo nano /etc/hosts
 
 # - Add the following line to your `hosts` files
-127.0.0.1       app.stonk.local
+127.0.0.1       api.stonk.local
 ```
 
 ## General usage
@@ -41,15 +41,27 @@ host$ > make run-d
 * Refer to the content of the `Makefile` for other useful commands
 
 
-## Conclusion
+## Finally
 After configuring your VIRTUAL_HOST, and running `make build && make run` in the root folder of the project.
 
-Backend app will be accessible on http://app.stonk.local:8080
+Backend app will be accessible on http://api.stonk.local
 
 ---
 
 
 ## Extra
-### Conecting to containers
+### Connecting to containers
 * Run `make connect service=<service>`
-  *  The `service` must be the name defined in the docker-compose files, e.g. `api` or `ui`, etc.
+  *  The `service` must be the name defined in the docker-compose files, e.g. `api` or `database`.
+* To test the `api`
+  * Connect to the running service 
+  * Run the `test` yarn command in the `api` container
+  ```
+  host $ make connect service=api
+  /app # yarn run test
+  ```
+
+## Things to improve on
+- Authentication of `Users`
+- Authorization
+- Full CRUD for all Major Entities [`Trades`, `Stock`, `Users`]

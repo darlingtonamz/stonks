@@ -32,15 +32,37 @@ let StocksService = class StocksService {
             this.repository = this.connectionService.connection.getRepository(stock_entity_1.StockEntity);
         });
     }
+    getOneStock(query, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let stock;
+            try {
+                stock = yield this.repository.findOne(query, options);
+            }
+            catch (e) {
+                throw { statusCode: 500, message: e };
+            }
+            if (!stock) {
+                throw { statusCode: 404, message: `Stock ${JSON.stringify(query)} not found` };
+            }
+            return stock;
+        });
+    }
     createOneStock(body) {
         return __awaiter(this, void 0, void 0, function* () {
+            const existingStock = yield this.repository.findOne({ symbol: body.symbol });
+            if (existingStock) {
+                throw {
+                    statusCode: 400,
+                    message: `Stock with the same symbol (${body.symbol}) already exists`,
+                };
+            }
             return this.repository.save(this.repository.merge(new stock_entity_1.StockEntity(), body));
         });
     }
     getPeriodHighLowStockPrices(symbol, start, end) {
         return __awaiter(this, void 0, void 0, function* () {
-            start = start ? date_fns_1.parse(start, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString() : undefined;
-            end = end ? date_fns_1.parse(end, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString() : undefined;
+            start = start ? date_fns_1.format(date_fns_1.parse(start, 'yyyy-MM-dd', new Date()), 'yyyy-MM-dd HH:mm:ss') : undefined;
+            end = end ? date_fns_1.format(date_fns_1.endOfDay(date_fns_1.parse(end, 'yyyy-MM-dd', new Date())), 'yyyy-MM-dd HH:mm:ss') : undefined;
             const prices = (yield this.repository.query(`SELECT price
           FROM trades 
           WHERE
@@ -59,11 +81,15 @@ let StocksService = class StocksService {
             }
         });
     }
-    getStockStats(reply, start, end) {
+    getStockStats(start, end) {
         return __awaiter(this, void 0, void 0, function* () {
-            start = start ? date_fns_1.parse(start, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString() : undefined;
-            end = end ? date_fns_1.parse(end, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString() : undefined;
+            start = start ? date_fns_1.format(date_fns_1.parse(start, 'yyyy-MM-dd', new Date()), 'yyyy-MM-dd HH:mm:ss') : undefined;
+            end = end ? date_fns_1.format(date_fns_1.endOfDay(date_fns_1.parse(end, 'yyyy-MM-dd', new Date())), 'yyyy-MM-dd HH:mm:ss') : undefined;
             const stockTradesMap = {};
+            const stocks = yield this.repository.query(`SELECT stocks.symbol FROM stocks`);
+            stocks.forEach((stock) => {
+                stockTradesMap[stock.symbol] = [];
+            });
             let trades = [];
             try {
                 trades = yield this.repository.query(`SELECT symbol, price
@@ -74,8 +100,10 @@ let StocksService = class StocksService {
         `, [start, end]);
             }
             catch (error) {
-                reply.status(500);
-                throw new Error(error);
+                throw {
+                    statusCode: 500,
+                    message: error,
+                };
             }
             if (trades.length > 0) {
                 trades.forEach((trade) => {
@@ -98,25 +126,27 @@ let StocksService = class StocksService {
                         let newTrajectory = 'STABLE';
                         if (prevPrice != -1) {
                             const priceDiff = currentPrice - prevPrice;
+                            const absPriceDiff = Math.abs(priceDiff);
                             if (priceDiff > 0) {
                                 newTrajectory = 'DESC';
-                                maxFall = priceDiff > maxFall ? priceDiff : maxFall;
+                                maxFall = absPriceDiff > maxFall ? absPriceDiff : maxFall;
                             }
                             else if (priceDiff < 0) {
                                 newTrajectory = 'ASC';
-                                maxRise = priceDiff > maxRise ? priceDiff : maxRise;
+                                maxRise = absPriceDiff > maxRise ? absPriceDiff : maxRise;
                             }
                         }
                         if (currentTrajectory != newTrajectory) {
                             fluctuations += 1;
                         }
+                        currentTrajectory = newTrajectory;
                         prevPrice = currentPrice;
                     }
                     output.push({
                         stock: symbol,
                         fluctuations,
-                        'max_rise': maxRise,
-                        'max_fall': maxFall,
+                        'max_rise': Math.round(maxRise * 100) / 100,
+                        'max_fall': Math.round(maxFall * 100) / 100,
                     });
                 }
                 else {

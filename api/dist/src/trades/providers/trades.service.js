@@ -23,6 +23,7 @@ const fastify_decorators_1 = require("fastify-decorators");
 const trade_entity_1 = require("../entities/trade.entity");
 const connection_service_1 = require("../../db/providers/connection.service");
 const date_fns_1 = require("date-fns");
+const stocks_service_1 = require("../../stocks/providers/stocks.service");
 let TradesService = class TradesService {
     constructor(connectionService) {
         this.connectionService = connectionService;
@@ -35,18 +36,33 @@ let TradesService = class TradesService {
     hello(body) {
         return `Hello world! ${JSON.stringify(body)}`;
     }
+    getOneTrade(query, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let trade;
+            try {
+                trade = yield this.repository.findOne(query, options);
+            }
+            catch (e) {
+                throw { statusCode: 500, message: e };
+            }
+            if (!trade) {
+                throw { statusCode: 404, message: `Trade ${JSON.stringify(query)} not found` };
+            }
+            return trade;
+        });
+    }
     getManyTrades() {
         return __awaiter(this, void 0, void 0, function* () {
             return this.repository.find();
         });
     }
-    createOneTrade(body, reply) {
+    createOneTrade(body) {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.stocksService.getOneStock({ symbol: body.symbol });
             if (body.timestamp) {
-                const parsed = date_fns_1.parse(body.timestamp, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString();
+                const parsed = date_fns_1.parse(body.timestamp, 'yyyy-MM-dd HH:mm:ss', new Date()).toDateString();
                 if (parsed == 'Invalid Date') {
-                    reply.status(400);
-                    throw Error(`Invalid DateTime string (${body.timestamp}). Please format your string the way 'yyyy-MM-dd HH:mm:SS'`);
+                    throw { statusCode: 400, message: `Invalid DateTime string (${body.timestamp}). Please format your string the way 'yyyy-MM-dd HH:mm:SS'` };
                 }
             }
             return this.repository.save(this.repository.merge(new trade_entity_1.TradeEntity(), body));
@@ -67,6 +83,10 @@ let TradesService = class TradesService {
         });
     }
 };
+__decorate([
+    fastify_decorators_1.Inject(stocks_service_1.StocksService),
+    __metadata("design:type", stocks_service_1.StocksService)
+], TradesService.prototype, "stocksService", void 0);
 __decorate([
     fastify_decorators_1.Initializer([connection_service_1.ConnectionService]),
     __metadata("design:type", Function),

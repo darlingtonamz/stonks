@@ -27,11 +27,16 @@ function tradeSerializer(data) {
     let output;
     if (Array.isArray(data)) {
         output = data.map((trade) => {
-            trade.timestamp = date_fns_1.format(trade.timestamp, 'yyyy-MM-dd HH:mm:SS');
+            if (trade.timestamp)
+                trade.timestamp = date_fns_1.format(trade.timestamp, 'yyyy-MM-dd HH:mm:ss');
+            return trade;
         });
+        console.log({ output });
     }
     else {
-        output = Object.assign(Object.assign({}, data), { timestamp: date_fns_1.format(data.timestamp, 'yyyy-MM-dd HH:mm:SS') });
+        if (data.timestamp)
+            data.timestamp = date_fns_1.format(data.timestamp, 'yyyy-MM-dd HH:mm:ss');
+        output = data;
     }
     return JSON.stringify(output);
 }
@@ -40,8 +45,11 @@ let TradesController = class TradesController {
     constructor(service) {
         this.service = service;
     }
-    getMany() {
+    getMany(_, reply) {
         return __awaiter(this, void 0, void 0, function* () {
+            reply
+                .header('Content-Type', 'application/json')
+                .serializer(tradeSerializer);
             return this.service.getManyTrades();
         });
     }
@@ -51,7 +59,7 @@ let TradesController = class TradesController {
                 .status(201)
                 .header('Content-Type', 'application/json')
                 .serializer(tradeSerializer);
-            return this.service.createOneTrade(body, reply);
+            return this.service.createOneTrade(body);
         });
     }
     getManyByUserId({ params }) {
@@ -63,7 +71,7 @@ let TradesController = class TradesController {
 __decorate([
     fastify_decorators_1.GET('/'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], TradesController.prototype, "getMany", null);
 __decorate([
