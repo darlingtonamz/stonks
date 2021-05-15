@@ -8,12 +8,12 @@ function tradeSerializer(data: any) {
   let output;
   if (Array.isArray(data)) {
     output = data.map((trade) => {
-      trade.timestamp = format(trade.timestamp, 'yyyy-MM-dd HH:mm:SS');
+      trade.timestamp = format(trade.timestamp, 'yyyy-MM-dd HH:mm:ss');
     })
   } else {
     output = {
       ...data,
-      timestamp: format(data.timestamp, 'yyyy-MM-dd HH:mm:SS')
+      timestamp: format(data.timestamp, 'yyyy-MM-dd HH:mm:ss')
     };
   }
   return JSON.stringify(output);

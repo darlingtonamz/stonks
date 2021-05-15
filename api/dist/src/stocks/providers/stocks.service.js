@@ -59,11 +59,74 @@ let StocksService = class StocksService {
             }
         });
     }
-    getStockStats(start, end) {
+    getStockStats(reply, start, end) {
         return __awaiter(this, void 0, void 0, function* () {
             start = start ? date_fns_1.parse(start, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString() : undefined;
             end = end ? date_fns_1.parse(end, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString() : undefined;
-            return Promise.resolve([{ start, end }]);
+            const stockTradesMap = {};
+            let trades = [];
+            try {
+                trades = yield this.repository.query(`SELECT symbol, price
+          FROM trades 
+          WHERE
+            timestamp >= $1 AND timestamp <= $2
+          ORDER BY timestamp ASC
+        `, [start, end]);
+            }
+            catch (error) {
+                reply.status(500);
+                throw new Error(error);
+            }
+            if (trades.length > 0) {
+                trades.forEach((trade) => {
+                    if (!stockTradesMap[trade.symbol]) {
+                        stockTradesMap[trade.symbol] = [];
+                    }
+                    stockTradesMap[trade.symbol].push(trade);
+                });
+            }
+            const output = [];
+            for (const symbol in stockTradesMap) {
+                let fluctuations = 0;
+                const trades = stockTradesMap[symbol];
+                if (trades && trades.length > 0) {
+                    let currentTrajectory = 'STABLE';
+                    let prevPrice = -1;
+                    let maxRise = 0;
+                    let maxFall = 0;
+                    for (const { price: currentPrice } of trades) {
+                        let newTrajectory = 'STABLE';
+                        if (prevPrice != -1) {
+                            const priceDiff = currentPrice - prevPrice;
+                            if (priceDiff > 0) {
+                                newTrajectory = 'DESC';
+                                maxFall = priceDiff > maxFall ? priceDiff : maxFall;
+                            }
+                            else if (priceDiff < 0) {
+                                newTrajectory = 'ASC';
+                                maxRise = priceDiff > maxRise ? priceDiff : maxRise;
+                            }
+                        }
+                        if (currentTrajectory != newTrajectory) {
+                            fluctuations += 1;
+                        }
+                        prevPrice = currentPrice;
+                    }
+                    output.push({
+                        stock: symbol,
+                        fluctuations,
+                        'max_rise': maxRise,
+                        'max_fall': maxFall,
+                    });
+                }
+                else {
+                    output.push({
+                        stock: symbol,
+                        message: "There are no trades in the given date range",
+                    });
+                }
+            }
+            return output;
         });
     }
 };

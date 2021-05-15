@@ -16,6 +16,7 @@ const trade_entity_1 = require("../../trades/entities/trade.entity");
 let StockEntity = class StockEntity extends instance_entity_1.InstanceEntity {
 };
 __decorate([
+    typeorm_1.Index('idx_stocks_symbol'),
     typeorm_1.Column({ type: 'text', nullable: false }),
     __metadata("design:type", String)
 ], StockEntity.prototype, "symbol", void 0);

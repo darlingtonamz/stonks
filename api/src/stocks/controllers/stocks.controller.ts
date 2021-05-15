@@ -16,7 +16,7 @@ export class StocksController {
     { body }: { body: CreateStockDTO },
     reply: FastifyReply
   ) {
-    reply.status(201).send(await this.service.createOneStock(body));
+    reply.status(201).send(await this.service.createOneStock(reply, body));
   }
 
   // api.amanze.local/stocks/AC/price?start=2014-06-14 13:13:13&end=2014-06-14 13:13:13
@@ -30,10 +30,11 @@ export class StocksController {
 
   @GET('/stats')
   async getStats(
-    { query }: { query: any }
+    { query }: { query: any },
+    reply: FastifyReply
   ) {
     const { start, end } = query;
-    return this.service.getStockStats(start, end);
+    return this.service.getStockStats(reply, start, end);
   }
 }
 

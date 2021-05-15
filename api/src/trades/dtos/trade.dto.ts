@@ -49,7 +49,10 @@ export const TradeSchema: any = {
   //  TODO format timestamp to yyyy-MM-dd HH:mm:ss
   type: 'object',
   properties: {
-    type: { type: 'string' },
+    type: {
+      type: 'string',
+      // enum: 
+    },
     user: {
       type: 'object',
       properties: {

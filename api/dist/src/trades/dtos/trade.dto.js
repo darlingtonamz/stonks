@@ -69,7 +69,9 @@ exports.CreateTradeDTO = CreateTradeDTO;
 exports.TradeSchema = {
     type: 'object',
     properties: {
-        type: { type: 'string' },
+        type: {
+            type: 'string',
+        },
         user: {
             type: 'object',
             properties: {

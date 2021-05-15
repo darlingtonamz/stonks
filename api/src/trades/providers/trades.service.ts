@@ -33,7 +33,7 @@ export class TradesService {
     reply: FastifyReply
   ): Promise<TradeEntity> {
     if (body.timestamp) {
-      const parsed = parse(body.timestamp, 'yyyy-MM-dd HH:mm:SS', new Date()).toDateString();
+      const parsed = parse(body.timestamp, 'yyyy-MM-dd HH:mm:ss', new Date()).toDateString();
       if (parsed == 'Invalid Date') {
         reply.status(400)
         throw Error(`Invalid DateTime string (${body.timestamp}). Please format your string the way 'yyyy-MM-dd HH:mm:SS'`)
@@ -41,7 +41,7 @@ export class TradesService {
     }
     
     return this.repository.save(
-      this.repository.merge(new TradeEntity(), body)
+      this.repository.merge(new TradeEntity(), body as any)
     );
   }
   

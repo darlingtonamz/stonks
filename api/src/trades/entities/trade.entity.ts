@@ -1,5 +1,5 @@
 import { InstanceEntity } from "../../common/entities/instance.entity";
-import { Entity, Column, CreateDateColumn, JoinColumn } from "typeorm";
+import { Entity, Column, CreateDateColumn, JoinColumn, Index } from "typeorm";
 import { ManyToOne } from "typeorm";
 import { StockEntity } from "../../stocks/entities/stock.entity";
 
@@ -8,11 +8,17 @@ interface ITradeUser {
   name: string;
 }
 
+export enum TradeType {
+  Buy = 'buy',
+  Sell = 'sell',
+}
+
 @Entity('trades')
 export class TradeEntity extends InstanceEntity {
   @Column()
-  public type: string;
+  public type: TradeType;
 
+  @Index('idx_trades_user')
   @Column({ type: 'jsonb', nullable: true })
   public user: ITradeUser;
 
