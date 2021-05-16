@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 const configuration_1 = require("./config/configuration");
-const { port: PORT } = configuration_1.default();
 const app_1 = require("./app");
+const { port: PORT } = configuration_1.default();
 const server = app_1.default({
     logger: true,
 });

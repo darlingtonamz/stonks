@@ -18,29 +18,49 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TradeStocksController = void 0;
+exports.UsersService = void 0;
 const fastify_decorators_1 = require("fastify-decorators");
-const trades_service_1 = require("../providers/trades.service");
-let TradeStocksController = class TradeStocksController {
-    constructor(service) {
-        this.service = service;
+const user_entity_1 = require("../entities/user.entity");
+const connection_service_1 = require("../../db/providers/connection.service");
+let UsersService = class UsersService {
+    constructor(connectionService) {
+        this.connectionService = connectionService;
     }
-    deleteAllTrades() {
+    init() {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.service.deleteAllTrades();
+            this.repository = this.connectionService.connection.getRepository(user_entity_1.UserEntity);
+        });
+    }
+    getOneUser(query, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let user;
+            try {
+                user = yield this.repository.findOne(query, options);
+            }
+            catch (e) {
+                throw { statusCode: 500, message: e };
+            }
+            if (!user) {
+                throw { statusCode: 404, message: `User ${JSON.stringify(query)} not found` };
+            }
+            return user;
+        });
+    }
+    createOneUser(body) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.repository.save(this.repository.merge(new user_entity_1.UserEntity(), body));
         });
     }
 };
 __decorate([
-    fastify_decorators_1.DELETE('/'),
+    fastify_decorators_1.Initializer([connection_service_1.ConnectionService]),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], TradeStocksController.prototype, "deleteAllTrades", null);
-TradeStocksController = __decorate([
-    fastify_decorators_1.Controller({ route: '/erase' }),
-    __metadata("design:paramtypes", [trades_service_1.TradesService])
-], TradeStocksController);
-exports.TradeStocksController = TradeStocksController;
-exports.default = TradeStocksController;
-//# sourceMappingURL=tradeStocks.controller.js.map
+], UsersService.prototype, "init", null);
+UsersService = __decorate([
+    fastify_decorators_1.Service(),
+    __metadata("design:paramtypes", [connection_service_1.ConnectionService])
+], UsersService);
+exports.UsersService = UsersService;
+//# sourceMappingURL=users.service.js.map

@@ -1,15 +1,5 @@
 import { IsDefined, IsNotEmpty, IsString } from "class-validator";
 
-export class StockUserDTO {
-  @IsDefined()
-  @IsString()
-  id: string;
-
-  @IsDefined()
-  @IsString()
-  name: string;
-}
-
 export class CreateStockDTO {
   @IsNotEmpty()
   @IsDefined()

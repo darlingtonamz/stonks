@@ -7,25 +7,30 @@ import { bootstrap } from 'fastify-decorators';
 import { Constructor } from "fastify-decorators/decorators/helpers/inject-dependencies";
 import { IAppModule } from "./common/interfaces/interfaces";
 import { StocksModule } from "./stocks/stocks.module";
+import { UsersModule } from "./users/users.module";
 
 const Ajv = require('ajv').default;
 const AjvErrors = require('ajv-errors');
 
 export const appModules: IAppModule[] = [
+  UsersModule,
   TradesModule,
   StocksModule,
 ];
 
 function build(appOptions={}) {
-  const server: FastifyInstance = Fastify(appOptions);
+  const server: FastifyInstance = Fastify({
+    ...appOptions
+  });
 
   const ajv = new Ajv({
     allErrors: true,
     removeAdditional: true,
     useDefaults: true,
+    // jsonPointers: true
     coerceTypes: true,
     // nullable: true, 
-  })
+  });
   // enhance the ajv instance
   AjvErrors(ajv)
   
@@ -33,14 +38,6 @@ function build(appOptions={}) {
     const validation = ajv.compile(schema);
     return validation;
   });
-
-  // server.setErrorHandler(function (error, _, reply) {
-  //   console.log('Validator X1 ############', error)
-  //   if (error.validation) {
-  //     console.log('Validator X2 ############', error)
-  //      reply.status(422).send(new Error('validation failed'))
-  //   }
-  // })
   
   
   let controllers: Constructor<unknown>[] = [];

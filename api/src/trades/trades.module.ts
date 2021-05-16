@@ -1,10 +1,10 @@
 import { IAppModule } from "../common/interfaces/interfaces";
 import { TradesController } from "./controllers/trades.controller";
-import { TradeStocksController } from "./controllers/tradeStocks.controller";
+import { TradeAdminController } from "./controllers/tradeAdmin.controller";
 
 export const TradesModule: IAppModule = {
   controllers: [
     TradesController,
-    TradeStocksController,
+    TradeAdminController,
   ],
 };

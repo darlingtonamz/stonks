@@ -9,27 +9,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateStockSchema = exports.StockSchema = exports.CreateStockDTO = void 0;
+exports.CreateUserSchema = exports.UserSchema = exports.CreateUserDTO = void 0;
 const class_validator_1 = require("class-validator");
-class CreateStockDTO {
+class CreateUserDTO {
 }
 __decorate([
     class_validator_1.IsNotEmpty(),
     class_validator_1.IsDefined(),
     class_validator_1.IsString(),
     __metadata("design:type", String)
-], CreateStockDTO.prototype, "symbol", void 0);
-exports.CreateStockDTO = CreateStockDTO;
-exports.StockSchema = {
+], CreateUserDTO.prototype, "name", void 0);
+exports.CreateUserDTO = CreateUserDTO;
+exports.UserSchema = {
     type: 'object',
     properties: {
-        symbol: { type: 'string' },
+        name: { type: 'string' },
     },
     additionalProperties: false
 };
-exports.CreateStockSchema = {
+exports.CreateUserSchema = {
     type: 'object',
-    properties: exports.StockSchema.properties,
-    required: ['symbol']
+    properties: exports.UserSchema.properties,
+    required: ['name']
 };
-//# sourceMappingURL=stock.dto.js.map
+//# sourceMappingURL=user.dto.js.map

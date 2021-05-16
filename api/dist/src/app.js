@@ -15,9 +15,11 @@ const fastify_1 = require("fastify");
 const trades_module_1 = require("./trades/trades.module");
 const fastify_decorators_1 = require("fastify-decorators");
 const stocks_module_1 = require("./stocks/stocks.module");
+const users_module_1 = require("./users/users.module");
 const Ajv = require('ajv').default;
 const AjvErrors = require('ajv-errors');
 exports.appModules = [
+    users_module_1.UsersModule,
     trades_module_1.TradesModule,
     stocks_module_1.StocksModule,
 ];

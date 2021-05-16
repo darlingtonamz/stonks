@@ -2,7 +2,7 @@ import { Controller, DELETE } from 'fastify-decorators';
 import { TradesService } from '../providers/trades.service';
 
 @Controller({ route: '/erase' })
-export class TradeStocksController {
+export class TradeAdminController {
   constructor(public service: TradesService) {}
 
   @DELETE('/')
@@ -11,4 +11,4 @@ export class TradeStocksController {
   }
 }
 
-export default TradeStocksController;
+export default TradeAdminController;

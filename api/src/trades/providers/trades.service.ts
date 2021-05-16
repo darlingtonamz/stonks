@@ -5,6 +5,7 @@ import { TradeEntity } from '../entities/trade.entity';
 import { ConnectionService } from '../../db/providers/connection.service';
 import { parse } from 'date-fns';
 import { StocksService } from '../../stocks/providers/stocks.service';
+import { UsersService } from '../../users/providers/users.service';
 // import { FastifyReply } from 'fastify';
 
 @Service()
@@ -13,6 +14,9 @@ export class TradesService {
   
   @Inject(StocksService)
   private stocksService!: StocksService;
+
+  @Inject(UsersService)
+  private usersService!: UsersService;
 
   constructor(private connectionService: ConnectionService) {}
 
@@ -56,7 +60,10 @@ export class TradesService {
         throw { statusCode: 400, message: `Invalid DateTime string (${body.timestamp}). Please format your string the way 'yyyy-MM-dd HH:mm:SS'` }
       }
     }
-    
+
+    // verify that the user with id exists
+    await this.usersService.getOneUser({ id: body.user.id });
+
     return this.repository.save(
       this.repository.merge(new TradeEntity(), body as any)
     );

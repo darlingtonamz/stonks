@@ -1,1 +1,1 @@
-{"version":3,"file":"trades.module.js","sourceRoot":"","sources":["../../../src/trades/trades.module.ts"],"names":[],"mappings":";;;AACA,uEAAmE;AACnE,iFAA6E;AAGhE,QAAA,YAAY,GAAe;IACtC,WAAW,EAAE;QACX,oCAAgB;QAChB,8CAAqB;KACtB;CAEF,CAAC"}
+{"version":3,"file":"trades.module.js","sourceRoot":"","sources":["../../../src/trades/trades.module.ts"],"names":[],"mappings":";;;AACA,uEAAmE;AACnE,iFAA6E;AAEhE,QAAA,YAAY,GAAe;IACtC,WAAW,EAAE;QACX,oCAAgB;QAChB,8CAAqB;KACtB;CACF,CAAC"}

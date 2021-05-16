@@ -9,27 +9,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateStockSchema = exports.StockSchema = exports.CreateStockDTO = void 0;
-const class_validator_1 = require("class-validator");
-class CreateStockDTO {
-}
+exports.UserEntity = void 0;
+const instance_entity_1 = require("../../common/entities/instance.entity");
+const typeorm_1 = require("typeorm");
+let UserEntity = class UserEntity extends instance_entity_1.InstanceEntity {
+};
 __decorate([
-    class_validator_1.IsNotEmpty(),
-    class_validator_1.IsDefined(),
-    class_validator_1.IsString(),
+    typeorm_1.Column({ type: 'text', nullable: false }),
     __metadata("design:type", String)
-], CreateStockDTO.prototype, "symbol", void 0);
-exports.CreateStockDTO = CreateStockDTO;
-exports.StockSchema = {
-    type: 'object',
-    properties: {
-        symbol: { type: 'string' },
-    },
-    additionalProperties: false
-};
-exports.CreateStockSchema = {
-    type: 'object',
-    properties: exports.StockSchema.properties,
-    required: ['symbol']
-};
-//# sourceMappingURL=stock.dto.js.map
+], UserEntity.prototype, "name", void 0);
+UserEntity = __decorate([
+    typeorm_1.Entity('users')
+], UserEntity);
+exports.UserEntity = UserEntity;
+//# sourceMappingURL=user.entity.js.map

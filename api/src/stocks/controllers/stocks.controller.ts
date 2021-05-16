@@ -20,7 +20,6 @@ export class StocksController {
     return this.service.createOneStock(body);
   }
 
-  // GET /stocks/AC/price?start=2014-06-14&end=2014-06-14
   @GET('/:stock_symbol/price')
   async getPeriodHighLowTradePrices(
     { params, query }: { params: any, query: any }

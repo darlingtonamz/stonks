@@ -1,4 +1,8 @@
 # Stonk Project
+## Dependencies
+- [Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
+- [Docker-Compose](https://www.digitalocean.com/community/tutorials/how-to-install-docker-compose-on-ubuntu-18-04)
+- Make - `sudo apt-get install build-essential`
 
 ## First time setup
 
@@ -48,6 +52,12 @@ Backend app will be accessible on http://api.stonk.local
 
 ---
 
+# Usage
+Please checkout `./example.http` for all the endpoints required in this exercise. 
+To use the `example.http` file on VSCode, please install the [Rest Client (humao.rest-client)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension.
+
+I opted to use `UUID` instead of `integer` as a `id` reference for `[Users, Trades, and Stocks]`
+
 
 ## Extra
 ### Connecting to containers
@@ -58,6 +68,7 @@ Backend app will be accessible on http://api.stonk.local
   * Run the `test` yarn command in the `api` container
   ```
   host $ make connect service=api
+  /app # yarn run migration:run
   /app # yarn run test
   ```
 
@@ -65,6 +76,10 @@ Backend app will be accessible on http://api.stonk.local
 - Authentication of `Users`
 - Authorization of `Users`
 - Full CRUD for all Major Entities [`Trades`, `Stock`, `Users`]
+  - currently:
+    - `Trades` [Create, Read]
+    - `Users` [Create, Read]
+    - `Stocks` [Create, Read]
 - Add Linting Fix with ESLint
 - Configure testing through `make test` using proper `docker-compose.test.yml`
 - Reformating strings payloads with trailing spaces in Request.body

@@ -18,29 +18,47 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TradeStocksController = void 0;
+exports.UsersController = void 0;
 const fastify_decorators_1 = require("fastify-decorators");
-const trades_service_1 = require("../providers/trades.service");
-let TradeStocksController = class TradeStocksController {
+const user_dto_1 = require("../dtos/user.dto");
+const users_service_1 = require("../providers/users.service");
+let UsersController = class UsersController {
     constructor(service) {
         this.service = service;
     }
-    deleteAllTrades() {
+    getOne({ params }, reply) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.service.deleteAllTrades();
+            reply.status(201);
+            return this.service.getOneUser({ id: params['id'] });
+        });
+    }
+    createOne({ body }, reply) {
+        return __awaiter(this, void 0, void 0, function* () {
+            reply.status(201);
+            return this.service.createOneUser(body);
         });
     }
 };
 __decorate([
-    fastify_decorators_1.DELETE('/'),
+    fastify_decorators_1.GET('/:id'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
-], TradeStocksController.prototype, "deleteAllTrades", null);
-TradeStocksController = __decorate([
-    fastify_decorators_1.Controller({ route: '/erase' }),
-    __metadata("design:paramtypes", [trades_service_1.TradesService])
-], TradeStocksController);
-exports.TradeStocksController = TradeStocksController;
-exports.default = TradeStocksController;
-//# sourceMappingURL=tradeStocks.controller.js.map
+], UsersController.prototype, "getOne", null);
+__decorate([
+    fastify_decorators_1.POST('/', {
+        schema: {
+            body: user_dto_1.CreateUserSchema,
+        },
+    }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "createOne", null);
+UsersController = __decorate([
+    fastify_decorators_1.Controller({ route: '/users' }),
+    __metadata("design:paramtypes", [users_service_1.UsersService])
+], UsersController);
+exports.UsersController = UsersController;
+exports.default = UsersController;
+//# sourceMappingURL=users.controller.js.map
