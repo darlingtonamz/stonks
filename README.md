@@ -1,4 +1,8 @@
 # Stonk Project
+## Dependencies
+- [Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
+- [Docker-Compose](https://www.digitalocean.com/community/tutorials/how-to-install-docker-compose-on-ubuntu-18-04)
+- Make - `sudo apt-get install build-essential`
 
 ## First time setup
 
@@ -19,7 +23,7 @@ docker run -d -p 80:80 --name=nginx-reverse-proxy --network=nginx_proxy --restar
 host$ > sudo nano /etc/hosts
 
 # - Add the following line to your `hosts` files
-127.0.0.1       app.stonk.local
+127.0.0.1       api.stonk.local
 ```
 
 ## General usage
@@ -41,15 +45,43 @@ host$ > make run-d
 * Refer to the content of the `Makefile` for other useful commands
 
 
-## Conclusion
+## Finally
 After configuring your VIRTUAL_HOST, and running `make build && make run` in the root folder of the project.
 
-Backend app will be accessible on http://app.stonk.local:8080
+Backend app will be accessible on http://api.stonk.local
 
 ---
 
+# Usage
+Please checkout `./example.http` for all the endpoints required in this exercise. 
+To use the `example.http` file on VSCode, please install the [Rest Client (humao.rest-client)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension.
+
+I opted to use `UUID` instead of `integer` as a `id` reference for `[Users, Trades, and Stocks]`
+
 
 ## Extra
-### Conecting to containers
+### Connecting to containers
 * Run `make connect service=<service>`
-  *  The `service` must be the name defined in the docker-compose files, e.g. `api` or `ui`, etc.
+  *  The `service` must be the name defined in the docker-compose files, e.g. `api` or `database`.
+* To test the `api`
+  * Connect to the running service 
+  * Run the `test` yarn command in the `api` container
+  ```
+  host $ make connect service=api
+  /app # yarn run migration:run
+  /app # yarn run test
+  ```
+
+## Things to improve on
+- Authentication of `Users`
+- Authorization of `Users`
+- Full CRUD for all Major Entities [`Trades`, `Stock`, `Users`]
+  - currently:
+    - `Trades` [Create, Read]
+    - `Users` [Create, Read]
+    - `Stocks` [Create, Read]
+- Add Linting Fix with ESLint
+- Configure testing through `make test` using proper `docker-compose.test.yml`
+- Reformating strings payloads with trailing spaces in Request.body
+- Implement a `BaseController` - To abstract some of the bloat in the current controllers
+- Unit test for the `StocksService -> getStockStats(...)`

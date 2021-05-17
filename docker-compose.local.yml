@@ -5,6 +5,8 @@ services:
     image: stonk/api:${env}
     build:
       context: api
+    volumes:
+      - ./api:/app
     container_name: stonk-be-api-${env}
     expose:
       - 80

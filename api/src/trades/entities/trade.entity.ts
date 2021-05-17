@@ -1,16 +1,24 @@
 import { InstanceEntity } from "../../common/entities/instance.entity";
-import { Entity, Column, CreateDateColumn } from "typeorm";
+import { Entity, Column, CreateDateColumn, JoinColumn, Index } from "typeorm";
+import { ManyToOne } from "typeorm";
+import { StockEntity } from "../../stocks/entities/stock.entity";
 
 interface ITradeUser {
   id: string;
   name: string;
 }
 
+export enum TradeTypeEnum {
+  Buy = 'buy',
+  Sell = 'sell',
+}
+
 @Entity('trades')
 export class TradeEntity extends InstanceEntity {
   @Column()
-  public type: string;
+  public type: TradeTypeEnum;
 
+  @Index('idx_trades_user')
   @Column({ type: 'jsonb', nullable: true })
   public user: ITradeUser;
 
@@ -25,4 +33,12 @@ export class TradeEntity extends InstanceEntity {
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   public timestamp: Date;
+
+  @ManyToOne(
+    () => StockEntity,
+    (stock) => stock.trades,
+    { onDelete: 'CASCADE' },
+  )
+  @JoinColumn({ name: 'symbol', referencedColumnName: 'symbol' })
+  stock: StockEntity;
 }

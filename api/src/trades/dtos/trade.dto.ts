@@ -1,5 +1,6 @@
 import { IsDefined, IsInt, IsNotEmpty, IsNumber, IsObject, IsString, ValidateNested } from "class-validator";
 import { Type } from 'class-transformer';
+import { TradeType } from "../../common/constants/constants";
 
 export class TradeUserDTO {
   @IsDefined()
@@ -42,5 +43,52 @@ export class CreateTradeDTO {
   @IsNotEmpty()
   @IsDefined()
   @IsString()
-  public timestamp: Date;
+  public timestamp: string;
 }
+
+export const TradeSchema: any = {
+  type: 'object',
+  properties: {
+    type: {
+      type: 'string',
+      enum: Object.values(TradeType),
+      // errorMessage: {
+      //   type: 'Bad age',
+      //   enum: `body.type should be equal to one of the allowed values [${Object.values(TradeType)}]`
+      // //   // min: 'Too young',
+      // }
+    },
+    user: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string',
+          pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+        },
+        name: { type: 'string' },
+      },
+      additionalProperties: false,
+    },
+    symbol: { type: 'string' },
+    shares: {
+      type: 'integer',
+      minimum: 10,
+      maximum: 30,
+    },
+    price: {
+      type: 'number',
+      minimum: 130.42,
+      maximum: 195.65,
+    },
+    timestamp: {
+      type: 'string',
+    },
+  },
+  additionalProperties: false
+};
+
+export const CreateTradeSchema = {
+  type: 'object',
+  properties:  TradeSchema.properties,
+  required: ['type', 'user', 'symbol', 'shares', 'price', 'timestamp']
+};

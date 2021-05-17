@@ -22,10 +22,8 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
-    "rootDir": "src",
-    // "esModuleInterop": true,
+    "rootDir": "./",
+    "baseUrl": "./",
   },
-  "exclude": ["node_modules"],
-  "include": ["./src/**/*.tsx", "./src/**/*.ts"]
+  "exclude": ["node_modules", "dist"]
 }
