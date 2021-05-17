@@ -28,7 +28,6 @@ function build(appOptions={}) {
     removeAdditional: true,
     useDefaults: true,
     coerceTypes: true,
-    // nullable: true, 
   });
   // enhance the ajv instance
   AjvErrors(ajv)

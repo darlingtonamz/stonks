@@ -56,7 +56,6 @@ export class TradesController {
   async getManyByUserId(
     {params}: {params: any}
   ) {
-    // TODO - MAke User a entity/module
     return this.service.getManyTradesByUserId(params.user_id);
   }
 }

@@ -6,7 +6,6 @@ import { ConnectionService } from '../../db/providers/connection.service';
 import { parse } from 'date-fns';
 import { StocksService } from '../../stocks/providers/stocks.service';
 import { UsersService } from '../../users/providers/users.service';
-// import { FastifyReply } from 'fastify';
 
 @Service()
 export class TradesService {

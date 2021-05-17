@@ -52,11 +52,6 @@ export const TradeSchema: any = {
     type: {
       type: 'string',
       enum: Object.values(TradeType),
-      // errorMessage: {
-      //   type: 'Bad age',
-      //   enum: `body.type should be equal to one of the allowed values [${Object.values(TradeType)}]`
-      // //   // min: 'Too young',
-      // }
     },
     user: {
       type: 'object',
