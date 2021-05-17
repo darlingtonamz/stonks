@@ -40,7 +40,7 @@ Content-Type: {{contentType}}
 
 ###
 
-get {{baseUrl}}/stocks/{{stockSymbol}}/price?stock_symbol={{stockSymbol}}&start=2014-06-14&end=2014-06-14
+get {{baseUrl}}/stocks/{{stockSymbol}}/price?start=2014-06-14&end=2014-06-14
 
 ###
 

@@ -23,7 +23,10 @@ exports.CreateStockDTO = CreateStockDTO;
 exports.StockSchema = {
     type: 'object',
     properties: {
-        symbol: { type: 'string' },
+        symbol: {
+            type: 'string',
+            pattern: '^[A-Z]*$',
+        },
     },
     additionalProperties: false
 };

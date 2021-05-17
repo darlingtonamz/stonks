@@ -23,7 +23,9 @@ exports.CreateUserDTO = CreateUserDTO;
 exports.UserSchema = {
     type: 'object',
     properties: {
-        name: { type: 'string' },
+        name: {
+            type: 'string',
+        },
     },
     additionalProperties: false
 };

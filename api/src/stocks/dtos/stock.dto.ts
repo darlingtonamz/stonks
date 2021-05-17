@@ -10,7 +10,10 @@ export class CreateStockDTO {
 export const StockSchema: any = {
   type: 'object',
   properties: {
-    symbol: { type: 'string' },
+    symbol: {
+      type: 'string',
+      pattern: '^[A-Z]*$',
+    },
   },
   additionalProperties: false
 };

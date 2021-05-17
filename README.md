@@ -84,3 +84,4 @@ I opted to use `UUID` instead of `integer` as a `id` reference for `[Users, Trad
 - Configure testing through `make test` using proper `docker-compose.test.yml`
 - Reformating strings payloads with trailing spaces in Request.body
 - Implement a `BaseController` - To abstract some of the bloat in the current controllers
+- Unit test for the `StocksService -> getStockStats(...)`

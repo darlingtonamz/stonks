@@ -10,7 +10,9 @@ export class CreateUserDTO {
 export const UserSchema: any = {
   type: 'object',
   properties: {
-    name: { type: 'string' },
+    name: {
+      type: 'string',
+    },
   },
   additionalProperties: false
 };

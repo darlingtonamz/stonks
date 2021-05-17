@@ -30,7 +30,7 @@ describe('Trades module', () => {
         method: 'POST',
         url: '/users',
         payload: {
-          "name": faker.random.word(),
+          "name": faker.finance.currencyCode(),
         }
       })).json();
 
@@ -171,7 +171,7 @@ describe('Trades module', () => {
           method: 'POST',
           url: '/users',
           payload: {
-            "name": faker.random.word(),
+            "name": faker.finance.currencyCode(),
           }
         })).json();
 
@@ -179,7 +179,7 @@ describe('Trades module', () => {
           method: 'POST',
           url: '/users',
           payload: {
-            "name": faker.random.word(),
+            "name": faker.finance.currencyCode(),
           }
         })).json();
 
@@ -187,7 +187,7 @@ describe('Trades module', () => {
           method: 'POST',
           url: '/stocks',
           payload: {
-            "symbol": faker.random.word().toUpperCase(),
+            "symbol": faker.finance.currencyCode().toUpperCase(),
           }
         })).json();
         

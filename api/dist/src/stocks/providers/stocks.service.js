@@ -59,15 +59,69 @@ let StocksService = class StocksService {
             return this.repository.save(this.repository.merge(new stock_entity_1.StockEntity(), body));
         });
     }
-    getPeriodHighLowStockPrices(symbol, start, end) {
-        return __awaiter(this, void 0, void 0, function* () {
+    validateStartEndDataString(start, end) {
+        try {
             start = start ? date_fns_1.format(date_fns_1.parse(start, 'yyyy-MM-dd', new Date()), 'yyyy-MM-dd HH:mm:ss') : undefined;
             end = end ? date_fns_1.format(date_fns_1.endOfDay(date_fns_1.parse(end, 'yyyy-MM-dd', new Date())), 'yyyy-MM-dd HH:mm:ss') : undefined;
-            const prices = (yield this.repository.query(`SELECT price
-          FROM trades 
-          WHERE
-            symbol = $1 AND timestamp >= $2 AND timestamp <= $3
-        `, [symbol, start, end]))
+            if (start && end) {
+                const startTime = date_fns_1.parse(start, 'yyyy-MM-dd HH:mm:ss', new Date());
+                const endTime = date_fns_1.parse(end, 'yyyy-MM-dd HH:mm:ss', new Date());
+                if (startTime > endTime) {
+                    throw new Error('Invalid time range');
+                }
+            }
+        }
+        catch (error) {
+            switch (error.message) {
+                case 'Invalid time value':
+                    throw {
+                        statusCode: 400,
+                        message: `Invalid time value | start(${start}) or end(${end}) | Accepted format: 'yyyy-MM-dd' `,
+                    };
+                case 'Invalid time range':
+                    throw {
+                        statusCode: 400,
+                        message: `Invalid time range | 'start'(${start}) must be less that 'end'(${end})`,
+                    };
+                default:
+                    break;
+            }
+        }
+        return { start, end };
+    }
+    getPeriodHighLowStockPrices(symbol, start, end) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.getOneStock({ symbol });
+            let startEndObj = this.validateStartEndDataString(start, end);
+            start = startEndObj.start;
+            end = startEndObj.end;
+            let query = `SELECT price
+      FROM trades 
+      WHERE
+        symbol = $1`;
+            let params = [symbol];
+            if (start && end) {
+                query = `SELECT price
+        FROM trades 
+        WHERE
+          symbol = $1 AND timestamp >= $2 AND timestamp <= $3`;
+                params = [symbol, start, end];
+            }
+            else if (start) {
+                query = `SELECT price
+        FROM trades 
+        WHERE
+          symbol = $1 AND timestamp >= $2`;
+                params = [symbol, start];
+            }
+            else if (end) {
+                query = `SELECT price
+        FROM trades 
+        WHERE
+          symbol = $1 AND timestamp <= $2`;
+                params = [symbol, end];
+            }
+            const prices = (yield this.repository.query(query, params))
                 .map((obj) => obj.price)
                 .sort((a, b) => a - b);
             if (prices.length > 0) {
@@ -83,8 +137,9 @@ let StocksService = class StocksService {
     }
     getStockStats(start, end) {
         return __awaiter(this, void 0, void 0, function* () {
-            start = start ? date_fns_1.format(date_fns_1.parse(start, 'yyyy-MM-dd', new Date()), 'yyyy-MM-dd HH:mm:ss') : undefined;
-            end = end ? date_fns_1.format(date_fns_1.endOfDay(date_fns_1.parse(end, 'yyyy-MM-dd', new Date())), 'yyyy-MM-dd HH:mm:ss') : undefined;
+            let startEndObj = this.validateStartEndDataString(start, end);
+            start = startEndObj.start;
+            end = startEndObj.end;
             const stockTradesMap = {};
             const stocks = yield this.repository.query(`SELECT stocks.symbol FROM stocks`);
             stocks.forEach((stock) => {
@@ -96,7 +151,7 @@ let StocksService = class StocksService {
           FROM trades 
           WHERE
             timestamp >= $1 AND timestamp <= $2
-          ORDER BY timestamp ASC
+          ORDER BY timestamp ASC, created_at
         `, [start, end]);
             }
             catch (error) {
@@ -123,20 +178,21 @@ let StocksService = class StocksService {
                     let maxRise = 0;
                     let maxFall = 0;
                     for (const { price: currentPrice } of trades) {
-                        let newTrajectory = 'STABLE';
+                        let newTrajectory = currentTrajectory;
                         if (prevPrice != -1) {
                             const priceDiff = currentPrice - prevPrice;
                             const absPriceDiff = Math.abs(priceDiff);
-                            if (priceDiff > 0) {
-                                newTrajectory = 'DESC';
-                                maxFall = absPriceDiff > maxFall ? absPriceDiff : maxFall;
-                            }
-                            else if (priceDiff < 0) {
+                            if (priceDiff > 0 && currentTrajectory != 'ASC') {
                                 newTrajectory = 'ASC';
                                 maxRise = absPriceDiff > maxRise ? absPriceDiff : maxRise;
                             }
+                            else if (priceDiff < 0 && currentTrajectory != 'DESC') {
+                                newTrajectory = 'DESC';
+                                maxFall = absPriceDiff > maxFall ? absPriceDiff : maxFall;
+                            }
                         }
-                        if (currentTrajectory != newTrajectory) {
+                        if (currentTrajectory != 'STABLE' &&
+                            currentTrajectory != newTrajectory) {
                             fluctuations += 1;
                         }
                         currentTrajectory = newTrajectory;

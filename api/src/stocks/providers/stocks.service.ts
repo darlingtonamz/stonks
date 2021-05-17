@@ -5,6 +5,11 @@ import { ConnectionService } from '../../db/providers/connection.service';
 import { endOfDay, format, parse } from 'date-fns';
 import { CreateStockDTO } from '../dtos/stock.dto';
 
+interface IStartEndTimeString {
+  start?: string| undefined;
+  end?: string | undefined;
+}
+
 @Service()
 export class StocksService {
   private repository!: Repository<StockEntity>;
@@ -44,19 +49,86 @@ export class StocksService {
     );
   }
 
+  validateStartEndDataString(
+    start?: string, end?: string
+  ): IStartEndTimeString {
+
+    try {
+      start = start ? format(parse(start, 'yyyy-MM-dd', new Date()), 'yyyy-MM-dd HH:mm:ss') : undefined;
+      end = end ? format(endOfDay(parse(end, 'yyyy-MM-dd', new Date())), 'yyyy-MM-dd HH:mm:ss') : undefined;
+      
+      if (start && end) {
+        const startTime = parse(
+          start,
+          'yyyy-MM-dd HH:mm:ss', new Date()
+        );
+        const endTime = parse(end,
+          'yyyy-MM-dd HH:mm:ss', new Date()
+        );
+
+        if (startTime > endTime) {
+          throw new Error('Invalid time range')
+        }
+      }
+    } catch (error) {
+      switch (error.message) {
+        case 'Invalid time value':
+          throw {
+            statusCode: 400,
+            message: `Invalid time value | start(${start}) or end(${end}) | Accepted format: 'yyyy-MM-dd' `,
+          }
+        case 'Invalid time range':
+          throw {
+            statusCode: 400,
+            message: `Invalid time range | 'start'(${start}) must be less that 'end'(${end})`,
+          }      
+        default:
+          break;
+      }
+    }
+    return { start, end };
+  }
+
   public async getPeriodHighLowStockPrices(
     symbol: string,
     start?: string,
     end?: string
   ): Promise<{symbol?: string, highest?: string, lowest?: string, message?: string}> {
-    start = start ? format(parse(start, 'yyyy-MM-dd', new Date()), 'yyyy-MM-dd HH:mm:ss') : undefined;
-    end = end ? format(endOfDay(parse(end, 'yyyy-MM-dd', new Date())), 'yyyy-MM-dd HH:mm:ss') : undefined;
+    // Using this to verify if the Stock exists
+    await this.getOneStock({ symbol });
+
+    let startEndObj: IStartEndTimeString = this.validateStartEndDataString(start, end);
+    start = startEndObj.start;
+    end = startEndObj.end;
+
+    let query = `SELECT price
+      FROM trades 
+      WHERE
+        symbol = $1`;
+    let params = [symbol];
+
+    if (start && end) {
+      query = `SELECT price
+        FROM trades 
+        WHERE
+          symbol = $1 AND timestamp >= $2 AND timestamp <= $3`;
+      params = [symbol, start, end];
+    } else if (start) {
+      query = `SELECT price
+        FROM trades 
+        WHERE
+          symbol = $1 AND timestamp >= $2`;
+      params = [symbol, start];
+    } else if (end) {
+      query = `SELECT price
+        FROM trades 
+        WHERE
+          symbol = $1 AND timestamp <= $2`;
+      params = [symbol, end];
+    }
+
     const prices = (
-        await this.repository.query(`SELECT price
-          FROM trades 
-          WHERE
-            symbol = $1 AND timestamp >= $2 AND timestamp <= $3
-        `, [symbol, start, end])
+        await this.repository.query(query, params)
       )
       .map((obj: {price: number}) => obj.price)
       .sort((a: number, b: number) => a - b);
@@ -76,9 +148,9 @@ export class StocksService {
     start?: string,
     end?: string,
   ): Promise<any[]> {
-    start = start ? format(parse(start, 'yyyy-MM-dd', new Date()), 'yyyy-MM-dd HH:mm:ss') : undefined;
-    end = end ? format(endOfDay(parse(end, 'yyyy-MM-dd', new Date())), 'yyyy-MM-dd HH:mm:ss') : undefined;
-    
+    let startEndObj: IStartEndTimeString = this.validateStartEndDataString(start, end);
+    start = startEndObj.start;
+    end = startEndObj.end;
     const stockTradesMap: {[key: string] : {symbol: string, price: number}[]} = {}
 
     const stocks = await this.repository.query(`SELECT stocks.symbol FROM stocks`);
@@ -93,7 +165,7 @@ export class StocksService {
           FROM trades 
           WHERE
             timestamp >= $1 AND timestamp <= $2
-          ORDER BY timestamp ASC
+          ORDER BY timestamp ASC, created_at
         `, [start, end]);  
     } catch (error) {
       throw {
@@ -122,19 +194,23 @@ export class StocksService {
         let maxFall = 0;
   
         for (const { price: currentPrice } of trades) {
-          let newTrajectory = 'STABLE';
+          let newTrajectory = currentTrajectory;
           if (prevPrice != -1) {
             const priceDiff = currentPrice - prevPrice;
             const absPriceDiff = Math.abs(priceDiff);
-            if (priceDiff > 0) {
-              newTrajectory = 'DESC';
-              maxFall = absPriceDiff > maxFall ? absPriceDiff : maxFall;
-            } else if (priceDiff < 0) {
+            if (priceDiff > 0 && currentTrajectory != 'ASC') {
               newTrajectory = 'ASC';
               maxRise = absPriceDiff > maxRise ? absPriceDiff : maxRise;
+            } else if (priceDiff < 0 && currentTrajectory != 'DESC') {
+              newTrajectory = 'DESC';
+              maxFall = absPriceDiff > maxFall ? absPriceDiff : maxFall;
             }
           }
-          if (currentTrajectory != newTrajectory) {
+
+          if (
+            currentTrajectory != 'STABLE' &&
+            currentTrajectory != newTrajectory
+          ) {
             fluctuations += 1;
           }
           currentTrajectory = newTrajectory;

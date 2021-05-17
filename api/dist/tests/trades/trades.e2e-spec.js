@@ -13,7 +13,7 @@ const faker = require("faker");
 const util_1 = require("../util");
 const typeorm_1 = require("typeorm");
 const constants_1 = require("../../src/common/constants/constants");
-describe('Abilities Controllers', () => {
+describe('Trades module', () => {
     let app;
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         app = yield util_1.createApp();
@@ -30,7 +30,7 @@ describe('Abilities Controllers', () => {
                 method: 'POST',
                 url: '/users',
                 payload: {
-                    "name": faker.random.word(),
+                    "name": faker.finance.currencyCode(),
                 }
             })).json();
             stock = (yield app.inject({
@@ -150,21 +150,21 @@ describe('Abilities Controllers', () => {
                     method: 'POST',
                     url: '/users',
                     payload: {
-                        "name": faker.random.word(),
+                        "name": faker.finance.currencyCode(),
                     }
                 })).json();
                 const externalUser = (yield app.inject({
                     method: 'POST',
                     url: '/users',
                     payload: {
-                        "name": faker.random.word(),
+                        "name": faker.finance.currencyCode(),
                     }
                 })).json();
                 const newStock = (yield app.inject({
                     method: 'POST',
                     url: '/stocks',
                     payload: {
-                        "symbol": faker.random.word().toUpperCase(),
+                        "symbol": faker.finance.currencyCode().toUpperCase(),
                     }
                 })).json();
                 let response = yield app.inject({
