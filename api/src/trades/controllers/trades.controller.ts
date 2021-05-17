@@ -12,8 +12,7 @@ function tradeSerializer(data: any) {
       if (trade.timestamp)
         trade.timestamp = format(trade.timestamp, 'yyyy-MM-dd HH:mm:ss');
       return trade;
-    })
-    console.log({output})
+    });
   } else {
     if (data.timestamp)
       data.timestamp = format(data.timestamp, 'yyyy-MM-dd HH:mm:ss');

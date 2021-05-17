@@ -1,8 +1,0 @@
-{
-  "dependencies": {
-    "ajv-errors": "^3.0.0"
-  },
-  "devDependencies": {
-    "pino-pretty": "^4.8.0"
-  }
-}

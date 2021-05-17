@@ -22,13 +22,29 @@ exports.UsersController = void 0;
 const fastify_decorators_1 = require("fastify-decorators");
 const user_dto_1 = require("../dtos/user.dto");
 const users_service_1 = require("../providers/users.service");
+const UserGetOneParamSchema = {
+    type: 'object',
+    properties: {
+        id: {
+            type: 'string',
+            pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+        },
+    },
+    required: ['id'],
+};
 let UsersController = class UsersController {
     constructor(service) {
         this.service = service;
     }
+    getMany(_, reply) {
+        return __awaiter(this, void 0, void 0, function* () {
+            reply.status(200);
+            return this.service.getManyUsers();
+        });
+    }
     getOne({ params }, reply) {
         return __awaiter(this, void 0, void 0, function* () {
-            reply.status(201);
+            reply.status(200);
             return this.service.getOneUser({ id: params['id'] });
         });
     }
@@ -40,7 +56,17 @@ let UsersController = class UsersController {
     }
 };
 __decorate([
-    fastify_decorators_1.GET('/:id'),
+    fastify_decorators_1.GET('/'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getMany", null);
+__decorate([
+    fastify_decorators_1.GET('/:id', {
+        schema: {
+            params: UserGetOneParamSchema,
+        },
+    }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)

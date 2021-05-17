@@ -51,6 +51,11 @@ let UsersService = class UsersService {
             return this.repository.save(this.repository.merge(new user_entity_1.UserEntity(), body));
         });
     }
+    getManyUsers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.repository.find();
+        });
+    }
 };
 __decorate([
     fastify_decorators_1.Initializer([connection_service_1.ConnectionService]),

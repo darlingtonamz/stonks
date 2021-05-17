@@ -24,6 +24,7 @@ const trade_entity_1 = require("../entities/trade.entity");
 const connection_service_1 = require("../../db/providers/connection.service");
 const date_fns_1 = require("date-fns");
 const stocks_service_1 = require("../../stocks/providers/stocks.service");
+const users_service_1 = require("../../users/providers/users.service");
 let TradesService = class TradesService {
     constructor(connectionService) {
         this.connectionService = connectionService;
@@ -65,6 +66,7 @@ let TradesService = class TradesService {
                     throw { statusCode: 400, message: `Invalid DateTime string (${body.timestamp}). Please format your string the way 'yyyy-MM-dd HH:mm:SS'` };
                 }
             }
+            yield this.usersService.getOneUser({ id: body.user.id });
             return this.repository.save(this.repository.merge(new trade_entity_1.TradeEntity(), body));
         });
     }
@@ -87,6 +89,10 @@ __decorate([
     fastify_decorators_1.Inject(stocks_service_1.StocksService),
     __metadata("design:type", stocks_service_1.StocksService)
 ], TradesService.prototype, "stocksService", void 0);
+__decorate([
+    fastify_decorators_1.Inject(users_service_1.UsersService),
+    __metadata("design:type", users_service_1.UsersService)
+], TradesService.prototype, "usersService", void 0);
 __decorate([
     fastify_decorators_1.Initializer([connection_service_1.ConnectionService]),
     __metadata("design:type", Function),

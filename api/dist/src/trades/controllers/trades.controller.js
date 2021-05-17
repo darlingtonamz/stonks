@@ -31,7 +31,6 @@ function tradeSerializer(data) {
                 trade.timestamp = date_fns_1.format(trade.timestamp, 'yyyy-MM-dd HH:mm:ss');
             return trade;
         });
-        console.log({ output });
     }
     else {
         if (data.timestamp)

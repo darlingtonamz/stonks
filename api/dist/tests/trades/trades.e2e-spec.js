@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const faker = require("faker");
 const util_1 = require("../util");
 const typeorm_1 = require("typeorm");
 const constants_1 = require("../../src/common/constants/constants");
@@ -23,7 +24,15 @@ describe('Abilities Controllers', () => {
     }));
     describe('Trades Controller', () => {
         let stock;
+        let user;
         beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
+            user = (yield app.inject({
+                method: 'POST',
+                url: '/users',
+                payload: {
+                    "name": faker.random.word(),
+                }
+            })).json();
             stock = (yield app.inject({
                 method: 'POST',
                 url: '/stocks',
@@ -37,8 +46,8 @@ describe('Abilities Controllers', () => {
                 const payload = {
                     type: constants_1.TradeType.BUY,
                     user: {
-                        id: "vghfghhghg",
-                        name: "gffggfgfgfgf",
+                        id: user.id,
+                        name: user.name,
                     },
                     symbol: stock.symbol,
                     shares: 29,
@@ -63,8 +72,8 @@ describe('Abilities Controllers', () => {
                 const goodPayload = {
                     type: constants_1.TradeType.BUY,
                     user: {
-                        id: "vghfghhghg",
-                        name: "gffggfgfgfgf",
+                        id: user.id,
+                        name: user.name,
                     },
                     symbol: stock.symbol,
                     shares: 29,
@@ -76,17 +85,14 @@ describe('Abilities Controllers', () => {
                     url: '/trades',
                     payload: Object.assign(Object.assign({}, goodPayload), { type: 'dffddf' }),
                 });
-                console.log({
-                    json: response.json()
-                });
                 expect(response.statusCode).toBe(400);
             }));
             it('should return status 404 with non-existent entity references', () => __awaiter(void 0, void 0, void 0, function* () {
                 const goodPayload = {
                     type: constants_1.TradeType.BUY,
                     user: {
-                        id: "vghfghhghg",
-                        name: "gffggfgfgfgf",
+                        id: user.id,
+                        name: user.name,
                     },
                     symbol: stock.symbol,
                     shares: 29,
@@ -98,10 +104,15 @@ describe('Abilities Controllers', () => {
                     url: '/trades',
                     payload: Object.assign(Object.assign({}, goodPayload), { symbol: 'NON-EXISTENT-SYMBOL' }),
                 });
-                console.log({
-                    json: response.json()
-                });
                 expect(response.statusCode).toBe(404);
+                const response2 = yield app.inject({
+                    method: 'POST',
+                    url: '/trades',
+                    payload: Object.assign(Object.assign({}, goodPayload), { user: {
+                            id: faker.datatype.uuid(),
+                        } }),
+                });
+                expect(response2.statusCode).toBe(404);
             }));
         });
         describe('GET /trades', () => {
@@ -113,8 +124,8 @@ describe('Abilities Controllers', () => {
                 const payload = {
                     type: constants_1.TradeType.BUY,
                     user: {
-                        id: "vghfghhghg",
-                        name: "gffggfgfgfgf",
+                        id: user.id,
+                        name: user.name,
                     },
                     symbol: stock.symbol,
                     shares: 29,
@@ -131,6 +142,131 @@ describe('Abilities Controllers', () => {
                     url: '/trades',
                 })).json().length;
                 expect(tradesCount).toEqual(existingTrades.length + 1);
+            }));
+        });
+        describe('GET /trades/users/:user_id', () => {
+            it('should return status 200 and return many Trade belonging to user', () => __awaiter(void 0, void 0, void 0, function* () {
+                const newUser = (yield app.inject({
+                    method: 'POST',
+                    url: '/users',
+                    payload: {
+                        "name": faker.random.word(),
+                    }
+                })).json();
+                const externalUser = (yield app.inject({
+                    method: 'POST',
+                    url: '/users',
+                    payload: {
+                        "name": faker.random.word(),
+                    }
+                })).json();
+                const newStock = (yield app.inject({
+                    method: 'POST',
+                    url: '/stocks',
+                    payload: {
+                        "symbol": faker.random.word().toUpperCase(),
+                    }
+                })).json();
+                let response = yield app.inject({
+                    method: 'POST',
+                    url: '/trades',
+                    payload: {
+                        type: constants_1.TradeType.BUY,
+                        user: {
+                            id: externalUser.id,
+                            name: externalUser.name,
+                        },
+                        symbol: stock.symbol,
+                        shares: 29,
+                        price: 140,
+                        timestamp: "2014-06-14 13:13:13"
+                    },
+                });
+                expect(response.statusCode).toBe(201);
+                let externalTrades = (yield app.inject({
+                    method: 'GET',
+                    url: `/trades`,
+                })).json();
+                expect(externalTrades.length > 0).toEqual(true);
+                let userTrades = (yield app.inject({
+                    method: 'GET',
+                    url: `/trades/users/${newUser.id}`,
+                })).json();
+                expect(userTrades.length).toEqual(0);
+                response = yield app.inject({
+                    method: 'POST',
+                    url: '/trades',
+                    payload: {
+                        type: constants_1.TradeType.BUY,
+                        user: {
+                            id: newUser.id,
+                            name: newUser.name,
+                        },
+                        symbol: newStock.symbol,
+                        shares: 29,
+                        price: 140,
+                        timestamp: "2014-06-14 13:13:13"
+                    },
+                });
+                expect(response.statusCode).toBe(201);
+                response = yield app.inject({
+                    method: 'POST',
+                    url: '/trades',
+                    payload: {
+                        type: constants_1.TradeType.BUY,
+                        user: {
+                            id: newUser.id,
+                            name: newUser.name,
+                        },
+                        symbol: newStock.symbol,
+                        shares: 13,
+                        price: 150,
+                        timestamp: "2014-06-14 13:13:13"
+                    },
+                });
+                expect(response.statusCode).toBe(201);
+                userTrades = (yield app.inject({
+                    method: 'GET',
+                    url: `/trades/users/${newUser.id}`,
+                })).json();
+                expect(userTrades.length).toEqual(2);
+            }));
+        });
+        describe('DELETE /erase', () => {
+            it('should return status 200 and return all Trade', () => __awaiter(void 0, void 0, void 0, function* () {
+                for (let i = 0; i < 5; i++) {
+                    const response = yield app.inject({
+                        method: 'POST',
+                        url: '/trades',
+                        payload: {
+                            type: constants_1.TradeType.BUY,
+                            user: {
+                                id: user.id,
+                                name: user.name,
+                            },
+                            symbol: stock.symbol,
+                            shares: 13,
+                            price: 150,
+                            timestamp: "2014-06-14 13:13:13"
+                        },
+                    });
+                    expect(response.statusCode).toBe(201);
+                }
+                let trades = (yield app.inject({
+                    method: 'GET',
+                    url: `/trades`,
+                })).json();
+                expect(trades.length > 0).toEqual(true);
+                let response = yield app.inject({
+                    method: 'DELETE',
+                    url: '/erase',
+                });
+                expect(response.statusCode).toBe(200);
+                trades = (yield app.inject({
+                    method: 'GET',
+                    url: `/trades`,
+                })).json();
+                expect(trades.length).toEqual(0);
             }));
         });
     });

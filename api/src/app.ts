@@ -27,7 +27,6 @@ function build(appOptions={}) {
     allErrors: true,
     removeAdditional: true,
     useDefaults: true,
-    // jsonPointers: true
     coerceTypes: true,
     // nullable: true, 
   });

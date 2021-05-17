@@ -18,10 +18,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TradeStocksController = void 0;
+exports.TradeAdminController = void 0;
 const fastify_decorators_1 = require("fastify-decorators");
 const trades_service_1 = require("../providers/trades.service");
-let TradeStocksController = class TradeStocksController {
+let TradeAdminController = class TradeAdminController {
     constructor(service) {
         this.service = service;
     }
@@ -36,11 +36,11 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], TradeStocksController.prototype, "deleteAllTrades", null);
-TradeStocksController = __decorate([
+], TradeAdminController.prototype, "deleteAllTrades", null);
+TradeAdminController = __decorate([
     fastify_decorators_1.Controller({ route: '/erase' }),
     __metadata("design:paramtypes", [trades_service_1.TradesService])
-], TradeStocksController);
-exports.TradeStocksController = TradeStocksController;
-exports.default = TradeStocksController;
-//# sourceMappingURL=tradeStocks.controller.js.map
+], TradeAdminController);
+exports.TradeAdminController = TradeAdminController;
+exports.default = TradeAdminController;
+//# sourceMappingURL=tradeAdmin.controller.js.map

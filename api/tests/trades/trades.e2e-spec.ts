@@ -1,3 +1,4 @@
+import * as faker from 'faker';
 import { FastifyInstance } from 'fastify';
 import {
   clearDatabase,
@@ -6,8 +7,9 @@ import {
 import { getConnection } from 'typeorm';
 import { TradeType } from '../../src/common/constants/constants';
 import { StockEntity } from '../../src/stocks/entities/stock.entity';
+import { UserEntity } from '../../src/users/entities/user.entity';
 
-describe('Abilities Controllers', () => {
+describe('Trades module', () => {
   let app: FastifyInstance;
 
   beforeAll(async () => {
@@ -21,8 +23,17 @@ describe('Abilities Controllers', () => {
 
   describe('Trades Controller', () => {
     let stock: StockEntity;
+    let user: UserEntity;
 
     beforeAll(async () => {
+      user = (await app.inject({
+        method: 'POST',
+        url: '/users',
+        payload: {
+          "name": faker.random.word(),
+        }
+      })).json();
+
       stock = (await app.inject({
         method: 'POST',
         url: '/stocks',
@@ -37,8 +48,8 @@ describe('Abilities Controllers', () => {
         const payload = {
           type: TradeType.BUY,
           user: {
-            id: "vghfghhghg",
-            name: "gffggfgfgfgf",
+            id: user.id,
+            name: user.name,
           },
           symbol: stock.symbol,
           shares: 29,
@@ -65,8 +76,8 @@ describe('Abilities Controllers', () => {
         const goodPayload = {
           type: TradeType.BUY,
           user: {
-            id: "vghfghhghg",
-            name: "gffggfgfgfgf",
+            id: user.id,
+            name: user.name,
           },
           symbol: stock.symbol,
           shares: 29,
@@ -81,9 +92,6 @@ describe('Abilities Controllers', () => {
             type: 'dffddf'
           },
         });
-        console.log({
-          json: response.json()
-        })
         expect(response.statusCode).toBe(400);
       });
       
@@ -91,14 +99,15 @@ describe('Abilities Controllers', () => {
         const goodPayload = {
           type: TradeType.BUY,
           user: {
-            id: "vghfghhghg",
-            name: "gffggfgfgfgf",
+            id: user.id,
+            name: user.name,
           },
           symbol: stock.symbol,
           shares: 29,
           price: 140,
           timestamp: "2014-06-14 13:13:13"
         };
+
         const response = await app.inject({
           method: 'POST',
           url: '/trades',
@@ -107,10 +116,19 @@ describe('Abilities Controllers', () => {
             symbol: 'NON-EXISTENT-SYMBOL',
           },
         });
-        console.log({
-          json: response.json()
-        })
         expect(response.statusCode).toBe(404);
+        
+        const response2 = await app.inject({
+          method: 'POST',
+          url: '/trades',
+          payload: {
+            ...goodPayload,
+            user: {
+              id: faker.datatype.uuid(),
+            }
+          },
+        });
+        expect(response2.statusCode).toBe(404);
       });
     });
 
@@ -124,8 +142,8 @@ describe('Abilities Controllers', () => {
         const payload = {
           type: TradeType.BUY,
           user: {
-            id: "vghfghhghg",
-            name: "gffggfgfgfgf",
+            id: user.id,
+            name: user.name,
           },
           symbol: stock.symbol,
           shares: 29,
@@ -144,6 +162,154 @@ describe('Abilities Controllers', () => {
           url: '/trades',
         })).json().length;
         expect(tradesCount).toEqual(existingTrades.length + 1);
+      });
+    });
+
+    describe('GET /trades/users/:user_id', () => {
+      it('should return status 200 and return many Trade belonging to user', async() => {
+        const newUser = (await app.inject({
+          method: 'POST',
+          url: '/users',
+          payload: {
+            "name": faker.random.word(),
+          }
+        })).json();
+
+        const externalUser = (await app.inject({
+          method: 'POST',
+          url: '/users',
+          payload: {
+            "name": faker.random.word(),
+          }
+        })).json();
+
+        const newStock = (await app.inject({
+          method: 'POST',
+          url: '/stocks',
+          payload: {
+            "symbol": faker.random.word().toUpperCase(),
+          }
+        })).json();
+        
+        // Create external user Trade
+        let response = await app.inject({
+          method: 'POST',
+          url: '/trades',
+          payload: {
+            type: TradeType.BUY,
+            user: {
+              id: externalUser.id,
+              name: externalUser.name,
+            },
+            symbol: stock.symbol,
+            shares: 29,
+            price: 140,
+            timestamp: "2014-06-14 13:13:13"
+          },
+        });
+        expect(response.statusCode).toBe(201);
+
+        // external trades count should be more than 0
+        let externalTrades = (await app.inject({
+          method: 'GET',
+          url: `/trades`,
+        })).json();
+        expect(externalTrades.length > 0).toEqual(true);
+
+        // user trades count should be 0
+        let userTrades = (await app.inject({
+          method: 'GET',
+          url: `/trades/users/${newUser.id}`,
+        })).json();
+        
+        expect(userTrades.length).toEqual(0);
+        
+        // Create first user Trade
+        response = await app.inject({
+          method: 'POST',
+          url: '/trades',
+          payload: {
+            type: TradeType.BUY,
+            user: {
+              id: newUser.id,
+              name: newUser.name,
+            },
+            symbol: newStock.symbol,
+            shares: 29,
+            price: 140,
+            timestamp: "2014-06-14 13:13:13"
+          },
+        });
+        expect(response.statusCode).toBe(201);
+
+        // Create second user Trade
+        response = await app.inject({
+          method: 'POST',
+          url: '/trades',
+          payload: {
+            type: TradeType.BUY,
+            user: {
+              id: newUser.id,
+              name: newUser.name,
+            },
+            symbol: newStock.symbol,
+            shares: 13,
+            price: 150,
+            timestamp: "2014-06-14 13:13:13"
+          },
+        });
+        expect(response.statusCode).toBe(201);
+        
+        userTrades = (await app.inject({
+          method: 'GET',
+          url: `/trades/users/${newUser.id}`,
+        })).json();
+        
+        expect(userTrades.length).toEqual(2);
+      });
+    });
+
+    describe('DELETE /erase', () => {
+      it('should return status 200 and return all Trade', async() => {
+        // create more trades
+        for (let i = 0; i < 5; i++) {
+          const response = await app.inject({
+            method: 'POST',
+            url: '/trades',
+            payload: {
+              type: TradeType.BUY,
+              user: {
+                id: user.id,
+                name: user.name,
+              },
+              symbol: stock.symbol,
+              shares: 13,
+              price: 150,
+              timestamp: "2014-06-14 13:13:13"
+            },
+          });
+          expect(response.statusCode).toBe(201);
+        }
+
+        // Trades count should be more than 0
+        let trades = (await app.inject({
+          method: 'GET',
+          url: `/trades`,
+        })).json();
+        expect(trades.length > 0).toEqual(true);
+
+        let response = await app.inject({
+          method: 'DELETE',
+          url: '/erase',
+        });
+        expect(response.statusCode).toBe(200);
+
+        // Trades count should be = 0
+        trades = (await app.inject({
+          method: 'GET',
+          url: `/trades`,
+        })).json();
+        expect(trades.length).toEqual(0);
       });
     });
   });

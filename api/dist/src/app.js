@@ -24,7 +24,7 @@ exports.appModules = [
     stocks_module_1.StocksModule,
 ];
 function build(appOptions = {}) {
-    const server = fastify_1.default(appOptions);
+    const server = fastify_1.default(Object.assign({}, appOptions));
     const ajv = new Ajv({
         allErrors: true,
         removeAdditional: true,
