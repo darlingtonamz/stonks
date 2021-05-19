@@ -14,7 +14,7 @@ ifndef no_install
 no_install =
 endif
 
-ifeq ($(SNACK_API_NO_INSTALL), 1)
+ifeq ($(STONK_API_NO_INSTALL), 1)
 no_install := true
 endif
 

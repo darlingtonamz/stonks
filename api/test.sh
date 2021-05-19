@@ -22,7 +22,7 @@ done
 
 shift $((OPTIND-1))
 
-RUNNING=$(docker ps -q --filter name="evenito-platform-be-api-${env}")
+RUNNING=$(docker ps -q --filter name="stonk-platform-be-api-${env}")
 
 if [ -z "$RUNNING" ]; then
   make run-d ${env}
@@ -38,6 +38,6 @@ CMD="$CMD && VERBOSE=$VERBOSE MARKERS=\"$MARKERS\" yarn test $@"
 
 echo "Running: $CMD"
 
-docker exec -t "evenito-platform-be-api-${env}" ash -c "$CMD"
+docker exec -t "stonk-platform-be-api-${env}" ash -c "$CMD"
 
 exit $?
