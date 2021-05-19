@@ -48,6 +48,26 @@ describe('Stocks module', () => {
                 expect(responseJson.id).toBeTruthy();
                 expect(responseJson.symbol).toEqual(payload.symbol);
             }));
+            it('should return status 400 and not create Stock with existing symbol', () => __awaiter(void 0, void 0, void 0, function* () {
+                const payload = {
+                    symbol: faker.finance.currencyCode().toUpperCase(),
+                };
+                let response = yield app.inject({
+                    method: 'POST',
+                    url: '/stocks',
+                    payload,
+                });
+                const exisitngStock = response.json();
+                expect(response.statusCode).toBe(201);
+                response = yield app.inject({
+                    method: 'POST',
+                    url: '/stocks',
+                    payload: {
+                        symbol: exisitngStock.symbol,
+                    },
+                });
+                expect(response.statusCode).toBe(400);
+            }));
             it('should return status 400 with bad payload', () => __awaiter(void 0, void 0, void 0, function* () {
                 const goodPayload = {
                     symbol: faker.finance.currencyCode().toUpperCase(),

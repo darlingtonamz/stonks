@@ -101,34 +101,26 @@ export class StocksService {
     start = startEndObj.start;
     end = startEndObj.end;
 
-    let query = `SELECT price
-      FROM trades 
-      WHERE
-        symbol = $1`;
+    let whereQuery = `WHERE symbol = $1`;
     let params = [symbol];
 
     if (start && end) {
-      query = `SELECT price
-        FROM trades 
-        WHERE
-          symbol = $1 AND timestamp >= $2 AND timestamp <= $3`;
+      whereQuery = `WHERE symbol = $1 AND timestamp >= $2 AND timestamp <= $3`;
       params = [symbol, start, end];
     } else if (start) {
-      query = `SELECT price
-        FROM trades 
-        WHERE
-          symbol = $1 AND timestamp >= $2`;
+      whereQuery = `WHERE symbol = $1 AND timestamp >= $2`;
       params = [symbol, start];
     } else if (end) {
-      query = `SELECT price
-        FROM trades 
-        WHERE
-          symbol = $1 AND timestamp <= $2`;
+      whereQuery = `WHERE symbol = $1 AND timestamp <= $2`;
       params = [symbol, end];
     }
 
     const prices = (
-        await this.repository.query(query, params)
+        await this.repository.query(`SELECT price
+          FROM trades
+          ${whereQuery}`,
+          params,
+        )
       )
       .map((obj: {price: number}) => obj.price)
       .sort((a: number, b: number) => a - b);
@@ -151,22 +143,35 @@ export class StocksService {
     let startEndObj: IStartEndTimeString = this.validateStartEndDataString(start, end);
     start = startEndObj.start;
     end = startEndObj.end;
+    
     const stockTradesMap: {[key: string] : {symbol: string, price: number}[]} = {}
-
     const stocks = await this.repository.query(`SELECT stocks.symbol FROM stocks`);
 
     stocks.forEach((stock: { symbol: string }) => {
       stockTradesMap[stock.symbol] = [];
     });
 
+    let whereQuery = ``;
+    let params: string[] = [];
+    if (start && end) {
+      whereQuery = `WHERE timestamp >= $1 AND timestamp <= $2`;
+      params = [start, end];
+    } else if (start) {
+      whereQuery = `WHERE timestamp >= $1`;
+      params = [start];
+    } else if (end) {
+      whereQuery = `WHERE timestamp <= $1`;
+      params = [end];
+    }
+
     let trades = [];
     try {
+      // fetch all stock trades in one request
       trades = await this.repository.query(`SELECT symbol, price
           FROM trades 
-          WHERE
-            timestamp >= $1 AND timestamp <= $2
+          ${whereQuery}
           ORDER BY timestamp ASC, created_at
-        `, [start, end]);  
+        `, params);  
     } catch (error) {
       throw {
         statusCode: 500,
@@ -184,6 +189,7 @@ export class StocksService {
     }
 
     const output = [];
+    // For each Stock Symbol, compute stats
     for (const symbol in stockTradesMap) {
       let fluctuations = 0;
       const trades = stockTradesMap[symbol];

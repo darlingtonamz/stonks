@@ -23,9 +23,6 @@ export class TradesService {
   async init(): Promise<void> {
     this.repository = this.connectionService.connection.getRepository(TradeEntity);
   }
-  hello(body?: any) {
-    return `Hello world! ${JSON.stringify(body)}`;
-  }
 
   public async getOneTrade(query: FindConditions<TradeEntity>, options?: FindOneOptions): Promise<TradeEntity> {
     let trade: TradeEntity | undefined;

@@ -36,6 +36,18 @@ export class TradesController {
     return this.service.getManyTrades();
   }
 
+  @GET('/:id')
+  async getOne(
+    request: FastifyRequest,
+    reply: FastifyReply
+  ) {
+    const params: any = request.params;
+    reply
+      .header('Content-Type', 'application/json')
+      .serializer(tradeSerializer)
+    return this.service.getOneTrade({ id: params['id'] });
+  }
+
   @POST('/', {
     schema: {
       body: CreateTradeSchema,

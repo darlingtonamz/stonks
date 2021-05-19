@@ -70,6 +70,8 @@ I opted to use `UUID` instead of `integer` as a `id` reference for `[Users, Trad
   * Connect to the running service 
   * Run the `test` yarn command in the `api` container
   ```
+  # from project-root directory
+  
   host $ make connect service=api
   /app # yarn run migration:run
   /app # yarn run test

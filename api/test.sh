@@ -1,3 +1,4 @@
+# WIP - Please ignore
 #!/usr/bin/env sh
 # This is meant to be run with the main Makefile and in a Bitbucket pipeline,
 # but should work just as well in a local shell as long as the necessary

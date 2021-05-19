@@ -34,9 +34,6 @@ let TradesService = class TradesService {
             this.repository = this.connectionService.connection.getRepository(trade_entity_1.TradeEntity);
         });
     }
-    hello(body) {
-        return `Hello world! ${JSON.stringify(body)}`;
-    }
     getOneTrade(query, options) {
         return __awaiter(this, void 0, void 0, function* () {
             let trade;

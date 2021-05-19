@@ -144,6 +144,42 @@ describe('Trades module', () => {
                 expect(tradesCount).toEqual(existingTrades.length + 1);
             }));
         });
+        describe('GET /trades/:id', () => {
+            let createdTrade;
+            beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
+                const payload = {
+                    type: constants_1.TradeType.BUY,
+                    user: {
+                        id: user.id,
+                        name: user.name,
+                    },
+                    symbol: stock.symbol,
+                    shares: 29,
+                    price: 140,
+                    timestamp: "2014-06-14 13:13:13"
+                };
+                createdTrade = (yield app.inject({
+                    method: 'POST',
+                    url: '/trades',
+                    payload,
+                })).json();
+            }));
+            it('should return status 200 and return one Trade', () => __awaiter(void 0, void 0, void 0, function* () {
+                const fetchedTrade = (yield app.inject({
+                    method: 'GET',
+                    url: `/trades/${createdTrade.id}`,
+                })).json();
+                expect(fetchedTrade.id).toEqual(createdTrade.id);
+                expect(fetchedTrade.symbol).toEqual(createdTrade.symbol);
+            }));
+            it('should return status 404, when non-existent trade_id is passed', () => __awaiter(void 0, void 0, void 0, function* () {
+                const response = yield app.inject({
+                    method: 'GET',
+                    url: `/trades/${faker.datatype.uuid()}`,
+                });
+                expect(response.statusCode).toBe(404);
+            }));
+        });
         describe('GET /trades/users/:user_id', () => {
             it('should return status 200 and return many Trade belonging to user', () => __awaiter(void 0, void 0, void 0, function* () {
                 const newUser = (yield app.inject({

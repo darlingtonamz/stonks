@@ -95,33 +95,23 @@ let StocksService = class StocksService {
             let startEndObj = this.validateStartEndDataString(start, end);
             start = startEndObj.start;
             end = startEndObj.end;
-            let query = `SELECT price
-      FROM trades 
-      WHERE
-        symbol = $1`;
+            let whereQuery = `WHERE symbol = $1`;
             let params = [symbol];
             if (start && end) {
-                query = `SELECT price
-        FROM trades 
-        WHERE
-          symbol = $1 AND timestamp >= $2 AND timestamp <= $3`;
+                whereQuery = `WHERE symbol = $1 AND timestamp >= $2 AND timestamp <= $3`;
                 params = [symbol, start, end];
             }
             else if (start) {
-                query = `SELECT price
-        FROM trades 
-        WHERE
-          symbol = $1 AND timestamp >= $2`;
+                whereQuery = `WHERE symbol = $1 AND timestamp >= $2`;
                 params = [symbol, start];
             }
             else if (end) {
-                query = `SELECT price
-        FROM trades 
-        WHERE
-          symbol = $1 AND timestamp <= $2`;
+                whereQuery = `WHERE symbol = $1 AND timestamp <= $2`;
                 params = [symbol, end];
             }
-            const prices = (yield this.repository.query(query, params))
+            const prices = (yield this.repository.query(`SELECT price
+          FROM trades
+          ${whereQuery}`, params))
                 .map((obj) => obj.price)
                 .sort((a, b) => a - b);
             if (prices.length > 0) {
@@ -145,14 +135,27 @@ let StocksService = class StocksService {
             stocks.forEach((stock) => {
                 stockTradesMap[stock.symbol] = [];
             });
+            let whereQuery = ``;
+            let params = [];
+            if (start && end) {
+                whereQuery = `WHERE timestamp >= $1 AND timestamp <= $2`;
+                params = [start, end];
+            }
+            else if (start) {
+                whereQuery = `WHERE timestamp >= $1`;
+                params = [start];
+            }
+            else if (end) {
+                whereQuery = `WHERE timestamp <= $1`;
+                params = [end];
+            }
             let trades = [];
             try {
                 trades = yield this.repository.query(`SELECT symbol, price
           FROM trades 
-          WHERE
-            timestamp >= $1 AND timestamp <= $2
+          ${whereQuery}
           ORDER BY timestamp ASC, created_at
-        `, [start, end]);
+        `, params);
             }
             catch (error) {
                 throw {

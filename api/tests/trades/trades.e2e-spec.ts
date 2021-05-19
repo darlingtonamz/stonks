@@ -8,6 +8,7 @@ import { getConnection } from 'typeorm';
 import { TradeType } from '../../src/common/constants/constants';
 import { StockEntity } from '../../src/stocks/entities/stock.entity';
 import { UserEntity } from '../../src/users/entities/user.entity';
+import { TradeEntity } from '../../src/trades/entities/trade.entity';
 
 describe('Trades module', () => {
   let app: FastifyInstance;
@@ -162,6 +163,48 @@ describe('Trades module', () => {
           url: '/trades',
         })).json().length;
         expect(tradesCount).toEqual(existingTrades.length + 1);
+      });
+    });
+
+    describe('GET /trades/:id', () => {
+      let createdTrade: TradeEntity;
+
+      beforeAll(async () => {        
+        const payload = {
+          type: TradeType.BUY,
+          user: {
+            id: user.id,
+            name: user.name,
+          },
+          symbol: stock.symbol,
+          shares: 29,
+          price: 140,
+          timestamp: "2014-06-14 13:13:13"
+        };
+        // Create more Trade
+        createdTrade = (await app.inject({
+          method: 'POST',
+          url: '/trades',
+          payload,
+        })).json();
+      });
+
+      it('should return status 200 and return one Trade', async() => {
+        const fetchedTrade = (await app.inject({
+          method: 'GET',
+          url: `/trades/${createdTrade.id}`,
+        })).json();
+        expect(fetchedTrade.id).toEqual(createdTrade.id);
+        expect(fetchedTrade.symbol).toEqual(createdTrade.symbol);
+      });
+
+      it('should return status 404, when non-existent trade_id is passed', async() => {
+        const response = await app.inject({
+          method: 'GET',
+          url: `/trades/${faker.datatype.uuid()}`,
+        });
+        
+        expect(response.statusCode).toBe(404);
       });
     });
 
