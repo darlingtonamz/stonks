@@ -6,7 +6,7 @@
   "author": "Amanze Ogbonna",
   "license": "MIT",
   "scripts": {
-    "prebuild": "rimraf dist",
+    "prebuild": "yarn install; rimraf dist",
     "start:dev": "nodemon dist/index.js",
     "build:dev": "tsc --watch --preserveWatchOutput",
     "start-": "nodemon dist/index.js",

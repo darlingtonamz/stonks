@@ -29,6 +29,7 @@ host$ > sudo nano /etc/hosts
 ## General usage
 
 ### Project
+* Create a copy of `secret.yml.example` and rename it to `secret.yml`
 * Run `make build`
   * The image is built and stored locally
 * Run `make run`
@@ -48,13 +49,15 @@ host$ > make run-d
 ## Finally
 After configuring your VIRTUAL_HOST, and running `make build && make run` in the root folder of the project.
 
-Backend app will be accessible on http://api.stonk.local
+Backend app will be accessible on http://api.stonk.local or http://localhost:8080
 
+To test that it is working go to <HOST>/health
 ---
 
 # Usage
-Please checkout `./example.http` for all the endpoints required in this exercise. 
-To use the `example.http` file on VSCode, please install the [Rest Client (humao.rest-client)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension.
+Please checkout `api/example.http` for all the endpoints required in this exercise.
+
+To use the `api/example.http` file on VSCode, please install the [Rest Client (humao.rest-client)](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension.
 
 I opted to use `UUID` instead of `integer` as a `id` reference for `[Users, Trades, and Stocks]`
 
@@ -85,3 +88,4 @@ I opted to use `UUID` instead of `integer` as a `id` reference for `[Users, Trad
 - Reformating strings payloads with trailing spaces in Request.body
 - Implement a `BaseController` - To abstract some of the bloat in the current controllers
 - Unit test for the `StocksService -> getStockStats(...)`
+- On Delete User -> Cascade-Delete User Trades

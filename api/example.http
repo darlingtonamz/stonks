@@ -33,7 +33,7 @@ post {{baseUrl}}/stocks
 Content-Type: {{contentType}}
 
 {
-    "symbol": "ACMEEX",
+    "symbol": "ACMEEX"
 }
 ###
 @stockSymbol = {{stock.response.body.symbol}}

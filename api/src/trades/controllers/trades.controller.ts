@@ -48,14 +48,19 @@ export class TradesController {
     reply
       .status(201)
       .header('Content-Type', 'application/json')
-      .serializer(tradeSerializer)
+      .serializer(tradeSerializer);
     return this.service.createOneTrade(body);
   }
 
   @GET('/users/:user_id')
   async getManyByUserId(
-    {params}: {params: any}
+    {params}: {params: any},
+    reply: FastifyReply
   ) {
+    reply
+      .status(201)
+      .header('Content-Type', 'application/json')
+      .serializer(tradeSerializer);
     return this.service.getManyTradesByUserId(params.user_id);
   }
 }

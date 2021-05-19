@@ -61,8 +61,12 @@ let TradesController = class TradesController {
             return this.service.createOneTrade(body);
         });
     }
-    getManyByUserId({ params }) {
+    getManyByUserId({ params }, reply) {
         return __awaiter(this, void 0, void 0, function* () {
+            reply
+                .status(201)
+                .header('Content-Type', 'application/json')
+                .serializer(tradeSerializer);
             return this.service.getManyTradesByUserId(params.user_id);
         });
     }
@@ -86,7 +90,7 @@ __decorate([
 __decorate([
     fastify_decorators_1.GET('/users/:user_id'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], TradesController.prototype, "getManyByUserId", null);
 TradesController = __decorate([

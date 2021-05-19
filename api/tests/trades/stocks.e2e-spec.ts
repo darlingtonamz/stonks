@@ -307,18 +307,19 @@ describe('Stocks module', () => {
         
         // create more trades
         for (const tradePayload of tradePayloads) {
+          const payload = {
+            type: TradeType.BUY,
+            user: {
+              id: user.id,
+              name: user.name,
+            },
+            shares: 10,
+            ...tradePayload
+          };
           const response = await app.inject({
             method: 'POST',
             url: '/trades',
-            payload: {
-              type: TradeType.BUY,
-              user: {
-                id: user.id,
-                name: user.name,
-              },
-              shares: 10,
-              ...tradePayload
-            },
+            payload,
           });
           expect(response.statusCode).toBe(201);
         }

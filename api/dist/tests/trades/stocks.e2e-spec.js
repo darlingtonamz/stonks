@@ -260,13 +260,14 @@ describe('Stocks module', () => {
                     },
                 ];
                 for (const tradePayload of tradePayloads) {
+                    const payload = Object.assign({ type: constants_1.TradeType.BUY, user: {
+                            id: user.id,
+                            name: user.name,
+                        }, shares: 10 }, tradePayload);
                     const response = yield app.inject({
                         method: 'POST',
                         url: '/trades',
-                        payload: Object.assign({ type: constants_1.TradeType.BUY, user: {
-                                id: user.id,
-                                name: user.name,
-                            }, shares: 10 }, tradePayload),
+                        payload,
                     });
                     expect(response.statusCode).toBe(201);
                 }
